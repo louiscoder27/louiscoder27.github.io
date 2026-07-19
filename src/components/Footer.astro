@@ -1,0 +1,61 @@
+---
+// Ft2 · Inline-rule single line — contact links, credit, copyright. No columns.
+import { SITE } from '../site.config';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="page foot__inner">
+    <p class="foot__line">
+      <span class="foot__mark">{SITE.title}</span>
+      {
+        SITE.links.map((l) => (
+          <>
+            <span class="foot__sep" aria-hidden="true">·</span>
+            <a class="foot__link" href={l.href}>{l.label}</a>
+          </>
+        ))
+      }
+      <span class="foot__sep" aria-hidden="true">·</span>
+      <span class="foot__copy">© {year}</span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    margin-top: var(--space-2xl);
+    border-top: var(--rule-hair) solid var(--color-rule);
+  }
+  .foot__inner {
+    padding-block: var(--space-lg);
+  }
+  .foot__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-sm);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  .foot__mark {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .foot__sep {
+    color: var(--color-rule);
+  }
+  .foot__link {
+    color: var(--color-accent);
+    white-space: nowrap;
+    padding-bottom: 1px;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-short) var(--ease-out);
+  }
+  .foot__link:hover {
+    border-bottom-color: var(--color-accent);
+  }
+</style>

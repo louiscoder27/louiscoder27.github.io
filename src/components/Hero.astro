@@ -1,0 +1,55 @@
+---
+// Editorial intro hero — worded, left-biased (breaks the masthead's centre symmetry).
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  lead: string;
+  ctaHref?: string;
+  ctaLabel?: string;
+}
+const { eyebrow, heading, lead, ctaHref, ctaLabel } = Astro.props;
+---
+
+<section class="hero">
+  <div class="page hero__inner">
+    {eyebrow && <p class="eyebrow hero__eyebrow">{eyebrow}</p>}
+    <h1 class="hero__heading">{heading}</h1>
+    <p class="hero__lead">{lead}</p>
+    {
+      ctaHref && ctaLabel && (
+        <p class="hero__cta">
+          <a class="chip" href={ctaHref}>
+            {ctaLabel} <span aria-hidden="true">→</span>
+          </a>
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero__inner {
+    padding-block: var(--space-xl) var(--space-lg);
+    max-width: 52rem;
+  }
+  .hero__eyebrow {
+    margin-bottom: var(--space-sm);
+  }
+  .hero__heading {
+    font-size: var(--text-display);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .hero__lead {
+    margin-top: var(--space-md);
+    max-width: 42ch;
+    font-size: var(--text-md);
+    line-height: 1.6;
+    color: var(--color-ink-2);
+  }
+  .hero__cta {
+    margin-top: var(--space-lg);
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { CATEGORY_META } from '../../lib/categories';
+import { CATEGORIES } from '../../content.config';
+import type { Category } from '../../content.config';
+import { getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
+---
+
+<BaseLayout
+  title="Blog"
+  description="Every essay on business analysis, macroeconomics, and personal investing."
+>
+  <section class="index">
+    <div class="page">
+      <header class="index__head">
+        <p class="eyebrow">The archive</p>
+        <h1 class="index__title">Blog</h1>
+        <p class="index__lead">
+          {posts.length} {posts.length === 1 ? 'essay' : 'essays'}, newest first. Or jump to a section:
+        </p>
+        <nav class="index__filters" aria-label="Categories">
+          {
+            (CATEGORIES as readonly Category[]).map((cat) => (
+              <a class="index__filter" href={withBase(`/category/${CATEGORY_META[cat].slug}`)}>
+                {cat}
+              </a>
+            ))
+          }
+        </nav>
+      </header>
+
+      {
+        posts.length > 0 ? (
+          <div class="index__list">
+            {posts.map((post) => (
+              <PostCard
+                title={post.data.title}
+                description={post.data.description}
+                pubDate={post.data.pubDate}
+                category={post.data.category}
+                slug={post.id}
+                readingTime={post.data.readingTime}
+              />
+            ))}
+          </div>
+        ) : (
+          <p class="index__empty">No essays published yet.</p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .index {
+    padding-block: var(--space-xl) 0;
+  }
+  .index__title {
+    font-size: var(--text-3xl);
+    letter-spacing: -0.025em;
+    margin-top: var(--space-2xs);
+  }
+  .index__lead {
+    margin-top: var(--space-sm);
+    color: var(--color-ink-2);
+  }
+  .index__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-top: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--color-ink);
+  }
+  .index__filter {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-accent);
+    padding: 0.35rem 0.75rem;
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: border-color var(--dur-short) var(--ease-out),
+      background-color var(--dur-short) var(--ease-out);
+  }
+  .index__filter:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-tint);
+  }
+  .index__list :global(.card:first-child) {
+    border-top: 0;
+  }
+  .index__empty {
+    margin-top: var(--space-md);
+    font-style: italic;
+    color: var(--color-ink-2);
+  }
+</style>

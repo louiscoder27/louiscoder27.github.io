@@ -1,0 +1,77 @@
+/* Hallmark · macrostructure: Stat-Led · N6 masthead · Ft2 inline-rule footer
+ * theme: custom · vibe: "bright, professional, editorial finance" · paper: oklch(96.5% 0.014 85) · accent: oklch(40% 0.105 258)
+ * display: Libre Franklin · body: Source Serif 4 · axes: light / geometric-sans / cool
+ * studied: no · context: user (beige paper + navy accent, sans headings + serif body) · v1.1.0
+ * Locked tokens — every colour/font/space in the build references a name below. No inline values.
+ */
+
+:root {
+  /* ---- Palette (OKLCH) — warm beige paper, warm neutrals, one cool navy accent ---- */
+  --color-paper: oklch(96.5% 0.014 85); /* light beige */
+  --color-paper-2: oklch(93.8% 0.016 84); /* card / raised surface */
+  --color-paper-3: oklch(91.2% 0.018 83); /* deepest surface, hovers */
+
+  --color-ink: oklch(24% 0.014 262); /* near-black, faintly navy */
+  --color-ink-2: oklch(42% 0.012 262); /* secondary text */
+
+  --color-rule: oklch(82% 0.012 82); /* hairline dividers (warm) */
+  --color-rule-2: oklch(88% 0.011 82); /* fainter dividers */
+  --color-muted: oklch(50% 0.012 80); /* de-emphasised text / labels */
+
+  --color-accent: oklch(40% 0.105 258); /* navy — links, wordmark, active */
+  --color-accent-strong: oklch(34% 0.10 260); /* navy pressed / hover-darken */
+  --color-accent-tint: oklch(93% 0.028 255); /* pale navy wash for card accents */
+  --color-accent-ink: oklch(97% 0.01 85); /* cream text on a navy fill */
+
+  --color-focus: oklch(48% 0.15 258); /* focus ring — instant, higher chroma */
+
+  /* ---- Type ---- */
+  --font-display: 'Libre Franklin Variable', 'Libre Franklin', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
+
+  /* Type scale — major third (1.25) from a 16px base */
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 1rem;
+  --text-md: 1.1875rem;
+  --text-lg: 1.4375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.1875rem;
+  --text-3xl: 2.75rem;
+  --text-4xl: 3.4375rem;
+  --text-display: clamp(2.75rem, 5vw + 1rem, 5rem);
+  --text-stat: clamp(3rem, 6vw + 0.5rem, 5.5rem); /* the lead figures */
+
+  /* ---- Spacing — 4pt scale ---- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+  --space-3xl: 9rem;
+
+  --page-gutter: clamp(1.25rem, 5vw, 4rem);
+  --measure: 68ch; /* reading measure for long-form body */
+  --content-max: 72rem; /* page container */
+
+  /* ---- Rules, radius, motion ---- */
+  --rule-hair: 1px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --dur-instant: 90ms;
+  --dur-short: 160ms;
+  --dur-med: 280ms;
+  --dur-long: 500ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0.3);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* z-scale */
+  --z-base: 1;
+  --z-header: 50;
+  --z-overlay: 100;
+}
