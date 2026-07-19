@@ -1,6 +1,6 @@
 // Central site configuration — edit these values to make the blog yours.
 export const SITE = {
-  title: 'Louis Tran',
+  title: 'Louis Trinh',
   // Small line that sits above the masthead wordmark (kept short, editorial).
   edition: 'Notes on Economics, Markets & Investing',
   // Sub-line under the wordmark in the masthead.
