@@ -1,0 +1,42 @@
+
+┌───────────────────────────────────────┬─────────────────────────────────────────┐
+│             Bạn muốn sửa              │                  File                   │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Bài viết (thêm/sửa/xoá)               │ src/content/posts/*.md — mỗi file .md   │
+│                                       │ là một bài                              │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Tên site, tác giả, dòng tagline, link │ src/site.config.ts                      │
+│  liên hệ (email/GitHub)               │                                         │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Chữ trên masthead: dòng trên          │                                         │
+│ (edition), tên lớn (title), dòng dưới │ src/site.config.ts                      │
+│  (kicker)                             │                                         │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Link nav (Home / Blog / About)        │ src/components/Header.astro ← file bạn  │
+│                                       │ đang mở                                 │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Tiêu đề + đoạn giới thiệu ở trang chủ │ src/pages/index.astro (props của <Hero  │
+│  (hero)                               │ .../>)                                  │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Trang About                           │ src/pages/about.astro                   │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Footer                                │ src/components/Footer.astro (+ link     │
+│                                       │ trong site.config.ts)                   │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Tên/mô tả 3 chuyên mục                │ src/lib/categories.ts (mô tả) và        │
+│                                       │ src/content.config.ts (tên)             │
+├───────────────────────────────────────┼─────────────────────────────────────────┤
+│ Màu sắc / font                        │ src/styles/tokens.css (đổi 1 chỗ, đổi   │
+│                                       │ cả site)                                │
+└───────────────────────────────────────┴─────────────────────────────────────────┘
+
+Thêm bài mới: tạo file .md trong src/content/posts/, phần đầu (frontmatter) theo mẫu:
+---
+title: Tiêu đề bài
+description: Tóm tắt một dòng
+pubDate: 2026-07-20
+category: Macro          # Business Analysis | Macro | Personal Investing
+readingTime: 5 min read
+---
+Nội dung viết bằng Markdown...
+Các số liệu ở trang chủ (số ự tính từ bài viết — khôngcần sửa tay.
