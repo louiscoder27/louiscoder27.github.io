@@ -25,19 +25,18 @@
 
   --color-focus: oklch(48% 0.15 258); /* focus ring — instant, higher chroma */
 
-  /* ---- Home hero grade (cinematic wash over the avatar photo) ---- */
-  --hero-wash-warm: oklch(48% 0.06 68 / 0.32); /* warm vintage multiply */
-  --hero-wash-cool: oklch(28% 0.05 258 / 0.30); /* navy in the shadows */
-  --hero-scrim: oklch(18% 0.02 260 / 0.74); /* bottom darkening for text */
-  --hero-scrim-top: oklch(18% 0.02 260 / 0.34); /* light top darkening */
-  --hero-ink: oklch(96% 0.01 85); /* cream text on the photo */
-  --hero-word: oklch(95% 0.012 85 / 0.86); /* translucent LOUIS wordmark */
+  /* ---- Home hero grade (light, natural — keeps the greens) ---- */
+  --hero-wash: oklch(30% 0.04 150 / 0.14); /* faint edge vignette */
+  --hero-scrim: oklch(16% 0.02 150 / 0.72); /* bottom darkening for text */
+  --hero-scrim-top: oklch(16% 0.02 150 / 0.30); /* light top darkening */
+  --hero-ink: oklch(97% 0.008 100); /* cream text on the photo */
+  /* LOUIS wordmark — translucent olive→cream gradient, blends into the foliage */
+  --hero-word-top: oklch(97% 0.02 110 / 0.94);
+  --hero-word-bot: oklch(70% 0.09 128 / 0.82);
 
   /* ---- Type ---- */
   --font-display: 'Libre Franklin Variable', 'Libre Franklin', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
-  /* Outlier — used only for the home hero wordmark (the "404"-style LOUIS) */
-  --font-hero: 'Bodoni Moda Variable', 'Bodoni Moda', 'Didot', Georgia, serif;
 
   /* Type scale — major third (1.25) from a 16px base */
   --text-xs: 0.75rem;
