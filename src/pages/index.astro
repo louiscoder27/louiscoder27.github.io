@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
+import HomeHero from '../components/HomeHero.astro';
 import StatStrip from '../components/StatStrip.astro';
 import PostCard from '../components/PostCard.astro';
 import CategoryCards from '../components/CategoryCards.astro';
@@ -30,14 +30,8 @@ const stats = [
 ];
 ---
 
-<BaseLayout>
-  <Hero
-    eyebrow="Personal journal"
-    heading="Thinking clearly about money, one essay at a time."
-    lead={`I'm ${SITE.author} — I write about how companies actually make money, where the macro cycle is turning, and how to build a portfolio you can hold through it. Plain English, no hot takes.`}
-    ctaHref={withBase('/blog')}
-    ctaLabel="Read the latest"
-  />
+<BaseLayout showMasthead={false}>
+  <HomeHero />
 
   <StatStrip stats={stats} />
 

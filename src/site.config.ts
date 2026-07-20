@@ -8,6 +8,15 @@ export const SITE = {
   author: 'Louis Trinh',
   description:
     'A personal journal on business analysis, macroeconomics, and building a durable personal portfolio — written in plain English, one essay at a time.',
+  // ---- Home hero (the full-screen first page) ----
+  hero: {
+    // The big "404-style" word overlaid on your photo.
+    word: 'LOUIS',
+    // The small mark in the top-left corner of the hero.
+    mark: 'Louis Trinh — Journal',
+    // Quote line(s) shown in the dark bar. Add your own later; leave [] to hide.
+    quotes: ['“Add your quote here — I’ll wire more lines whenever you send them.”'],
+  },
   // Used for the honest "time active" stat when there are no posts yet. The stat
   // prefers the earliest post date when posts exist, so update posts, not this.
   sinceYear: 2024,
