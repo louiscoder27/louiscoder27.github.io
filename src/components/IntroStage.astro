@@ -1,0 +1,458 @@
+---
+// The Canva opener rebuilt as ONE pinned stage. A single fixed meadow sits
+// behind a sticky viewport; scrolling crossfades between two layers *in place*
+// on the same screen — the handwritten name dissolves out, the About cards
+// dissolve in ("mờ và rõ dần") — before the page continues to the blog content.
+import { SITE } from '../site.config';
+
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
+const portrait = withBase('/portrait.jpg');
+const aboutHref = `${withBase('/')}#about`;
+
+// Uppercase-first, as written by the author: "Louis".
+const wordmark = 'Louis';
+
+// About content, from the author's sketch.
+const name = 'Trinh Dat';
+const affiliation = 'Investments Economics';
+const focus = ['Econometrics', 'Quantitative Trading'];
+
+const nav = [
+  { label: 'Home', href: withBase('/') },
+  { label: 'Blog', href: withBase('/blog') },
+  { label: 'About', href: aboutHref },
+];
+---
+
+<section class="intro" aria-label="Introduction">
+  <noscript>
+    <style>
+      /* Without JS there's no scroll crossfade — stack the two slides. */
+      .intro { height: auto !important; }
+      .intro__sticky { position: static !important; height: auto !important; }
+      .intro__layer { position: static !important; opacity: 1 !important; filter: none !important; transform: none !important; min-height: 100svh; }
+    </style>
+  </noscript>
+
+  <div class="intro__sticky">
+    <div class="intro__grade" aria-hidden="true"></div>
+    <div class="intro__grain" aria-hidden="true"></div>
+
+    <!-- Layer 1 — the handwritten name -->
+    <div class="intro__layer intro__layer--name">
+      <h1 class="intro__mark" aria-label={wordmark}>
+        <span class="intro__ink" aria-hidden="true">{wordmark}</span>
+      </h1>
+    </div>
+
+    <!-- Layer 2 — the About cards -->
+    <div class="intro__layer intro__layer--about" aria-labelledby="about-heading">
+      <h2 id="about-heading" class="sr-only">About</h2>
+      <div class="about__grid">
+        <article class="glass glass--text">
+          <div class="about__intro">
+            <p class="about__name">{name}</p>
+            <p class="about__affil">{affiliation}</p>
+          </div>
+          <div class="about__focus">
+            <p class="about__focus-title">Focus</p>
+            <ul class="about__list">
+              {focus.map((item) => <li class="about__item">{item}</li>)}
+            </ul>
+          </div>
+        </article>
+
+        <figure class="glass glass--photo">
+          <img
+            src={portrait}
+            alt={`${name}, in the university garden`}
+            width="1024"
+            height="1280"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </div>
+    </div>
+
+    <!-- Persistent footer — same quote + nav on both slides -->
+    <div class="intro__bar">
+      {
+        SITE.hero.quotes.length > 0 && (
+          <div class="intro__quotes">
+            {SITE.hero.quotes.map((q) => (
+              <p class="intro__quote">{q}</p>
+            ))}
+          </div>
+        )
+      }
+      <nav class="intro__nav" aria-label="Primary">
+        {
+          nav.map((item, i) => (
+            <>
+              {i > 0 && <span class="intro__sep" aria-hidden="true">·</span>}
+              <a class="intro__link" href={item.href}>{item.label}</a>
+            </>
+          ))
+        }
+      </nav>
+    </div>
+  </div>
+
+  <!-- Scroll target for the "About" nav link — lands where the cards are shown. -->
+  <span id="about" class="intro__anchor" aria-hidden="true"></span>
+</section>
+
+<style is:global>
+  @property --write {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 100;
+  }
+</style>
+
+<style define:vars={{ meadow: `url('${withBase('/background.jpg')}')` }}>
+  /* Tall so there's scroll travel to drive the crossfade; the sticky child
+     stays pinned to the viewport the whole way (one screen, no page change). */
+  .intro {
+    position: relative;
+    height: 260svh;
+    background: var(--color-ink);
+  }
+  .intro__anchor {
+    position: absolute;
+    top: 52%;
+    left: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .intro__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    isolation: isolate;
+    /* Fixed painterly meadow — locked to the viewport (Canva slide feel). */
+    background-image: var(--meadow);
+    background-size: cover;
+    background-position: 50% 50%;
+    background-attachment: fixed;
+    color: var(--hero-ink);
+  }
+
+  .intro__grade {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      linear-gradient(to bottom, oklch(97% 0.01 100 / 0.28) 0%, transparent 34%),
+      radial-gradient(120% 90% at 50% 42%, transparent 58%, var(--hero-wash) 100%),
+      linear-gradient(to bottom, transparent 58%, var(--hero-scrim) 100%);
+    pointer-events: none;
+  }
+  .intro__grain {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 165px 165px;
+    opacity: 0.12;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* Both layers occupy the same centred viewport box — one crossfades into the
+     other in place. In the no-JS/static fallback they simply stack. */
+  .intro__layer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: clamp(3rem, 8vh, 6rem) var(--page-gutter) clamp(6rem, 14vh, 9rem);
+  }
+  .intro__layer--name {
+    opacity: var(--name-op, 1);
+  }
+  .intro__layer--about {
+    opacity: var(--about-op, 0);
+    filter: blur(calc((1 - var(--about-op, 0)) * 16px));
+    transform: scale(calc(0.97 + var(--about-op, 0) * 0.03));
+    pointer-events: none;
+  }
+  .intro__layer--about.is-active {
+    pointer-events: auto;
+  }
+
+  /* ---- The handwritten wordmark ---- */
+  .intro__mark {
+    margin: 0;
+    line-height: 1;
+    text-align: center;
+  }
+  .intro__ink {
+    position: relative;
+    display: inline-block;
+    font-family: var(--font-script);
+    font-weight: 400;
+    font-size: clamp(4rem, 17vw, 13rem);
+    letter-spacing: 0.01em;
+    color: var(--hero-ink);
+    text-shadow: 0 2px 26px oklch(20% 0.02 150 / 0.55);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .intro__ink {
+      --write: 0;
+      -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--write) * 1%), transparent calc(var(--write) * 1% + 6%));
+      mask-image: linear-gradient(90deg, #000 calc(var(--write) * 1%), transparent calc(var(--write) * 1% + 6%));
+      animation: intro-write 2600ms var(--ease-out) 320ms both;
+    }
+    .intro__ink::after {
+      content: '';
+      position: absolute;
+      top: -6%;
+      bottom: 6%;
+      left: calc(var(--write) * 1%);
+      width: 3rem;
+      transform: translateX(-55%);
+      background: radial-gradient(closest-side, oklch(99% 0.02 100 / 0.75), transparent 72%);
+      filter: blur(7px);
+      pointer-events: none;
+      animation: intro-pen 2600ms linear 320ms both;
+    }
+  }
+  @keyframes intro-write {
+    from { --write: -6; }
+    to { --write: 112; }
+  }
+  @keyframes intro-pen {
+    0% { opacity: 0; }
+    7% { opacity: 1; }
+    86% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ---- About cards ---- */
+  .about__grid {
+    width: 100%;
+    max-width: var(--content-max);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: stretch;
+  }
+  .glass {
+    margin: 0;
+    background: color-mix(in srgb, var(--color-glass) calc(var(--glass-alpha) * 100%), transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid oklch(100% 0 0 / 0.35);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 60px oklch(20% 0.02 150 / 0.28);
+  }
+  .glass--text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.5rem, 4.5vh, 3rem);
+    padding: clamp(1.75rem, 5vw, 3.5rem);
+  }
+  .about__intro,
+  .about__focus {
+    font-family: var(--font-body);
+    font-style: italic;
+  }
+  .about__name {
+    margin: 0;
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .about__affil {
+    margin: var(--space-2xs) 0 0;
+    font-weight: 400;
+    font-size: clamp(1rem, 2.4vw, 1.4375rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .about__focus {
+    text-align: center;
+  }
+  .about__focus-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: clamp(1.75rem, 4.5vw, 3rem);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .about__list {
+    list-style: none;
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+  .about__item {
+    font-weight: 400;
+    font-size: clamp(1rem, 2.6vw, 1.5rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .glass--photo {
+    display: grid;
+    place-items: center;
+    padding: clamp(0.9rem, 2.4vw, 1.5rem);
+  }
+  .glass--photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: min(58vh, 26rem);
+    object-fit: cover;
+    border-radius: calc(var(--radius-lg) - 8px);
+  }
+
+  /* ---- Persistent footer ---- */
+  .intro__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(1.5rem, 4vw, 3rem);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    text-align: center;
+    padding-inline: var(--page-gutter);
+    animation: intro-rise var(--dur-long) var(--ease-out) 2200ms both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .intro__bar { animation: none; }
+  }
+  .intro__quotes {
+    max-width: 60ch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+  .intro__quote {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--hero-ink);
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 18px oklch(16% 0.02 150 / 0.6);
+  }
+  .intro__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: var(--space-sm);
+  }
+  .intro__sep {
+    color: var(--hero-ink);
+    opacity: 0.5;
+  }
+  .intro__link {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--hero-ink);
+    white-space: nowrap;
+    padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--dur-short) var(--ease-out);
+    text-shadow: 0 1px 18px oklch(16% 0.02 150 / 0.6);
+  }
+  .intro__link:hover {
+    border-bottom-color: var(--hero-ink);
+  }
+  .intro__link:focus-visible {
+    outline: 2px solid var(--hero-ink);
+    outline-offset: 3px;
+  }
+
+  @keyframes intro-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* iOS ignores background-attachment: fixed — fall back to a normal cover. */
+  @supports (-webkit-touch-callout: none) {
+    .intro__sticky { background-attachment: scroll; }
+  }
+
+  @media (min-width: 880px) {
+    .about__grid {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+      align-items: center;
+    }
+  }
+</style>
+
+<script>
+  // Progressive enhancement: drive the in-place crossfade from scroll position.
+  const section = document.querySelector<HTMLElement>('.intro');
+  const about = document.querySelector<HTMLElement>('.intro__layer--about');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (section && about && !reduce) {
+    const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const travel = section.offsetHeight - window.innerHeight;
+      const scrolled = Math.min(Math.max(-section.getBoundingClientRect().top, 0), travel);
+      const p = travel > 0 ? scrolled / travel : 0;
+
+      // Name dissolves out early (gone by ~32%); the About cards dissolve in from
+      // ~26% and then stay fully visible for the whole rest of the pinned scroll
+      // (~50%–100%) — a long, unmissable hold before the page releases.
+      const nameOp = 1 - clamp((p - 0.05) / 0.27);
+      const aboutOp = clamp((p - 0.26) / 0.24);
+
+      section.style.setProperty('--name-op', nameOp.toFixed(3));
+      section.style.setProperty('--about-op', aboutOp.toFixed(3));
+      about.classList.toggle('is-active', aboutOp > 0.5);
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  }
+</script>

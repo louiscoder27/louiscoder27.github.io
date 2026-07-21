@@ -34,9 +34,14 @@
   --hero-word-top: oklch(97% 0.02 110 / 0.94);
   --hero-word-bot: oklch(70% 0.09 128 / 0.82);
 
+  /* ---- Glass (translucent about cards over the garden photo) ---- */
+  --color-glass: #d8d6ca; /* author-specified card/photo tint */
+  --glass-alpha: 0.6; /* author-specified 60% opacity */
+
   /* ---- Type ---- */
   --font-display: 'Libre Franklin Variable', 'Libre Franklin', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-script: 'SVN-Holiday', 'Segoe Script', cursive; /* handwritten hero wordmark */
 
   /* Type scale — major third (1.25) from a 16px base */
   --text-xs: 0.75rem;
@@ -70,6 +75,7 @@
   --rule-hair: 1px;
   --radius-sm: 4px;
   --radius-md: 8px;
+  --radius-lg: 22px; /* translucent about cards */
 
   --dur-instant: 90ms;
   --dur-short: 160ms;

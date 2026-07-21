@@ -6,10 +6,12 @@ const base = import.meta.env.BASE_URL;
 const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
 const current = Astro.url.pathname.replace(/\/+$/, '') || '/';
 
+// The standalone About page was removed — About now lives as a section on the
+// home page, so the nav links to that anchor.
 const nav = [
   { label: 'Home', href: withBase('/') },
   { label: 'Blog', href: withBase('/blog') },
-  { label: 'About', href: withBase('/about') },
+  { label: 'About', href: `${withBase('/')}#about` },
 ];
 
 const isActive = (href: string) => {
