@@ -189,7 +189,7 @@ const nav = [
   /* ---- The handwritten wordmark ---- */
   .intro__mark {
     margin: 0;
-    line-height: 1;
+    line-height: 1.15;
     text-align: center;
   }
   .intro__ink {
@@ -198,6 +198,10 @@ const nav = [
     font-family: var(--font-script);
     font-weight: 400;
     font-size: clamp(4rem, 17vw, 13rem);
+    line-height: 1.3;
+    /* Extra room so the script's tall loops/descenders aren't clipped by the
+       ink mask (mask clips to this box) — more at the bottom for the L flourish. */
+    padding: 0.14em 0.16em 0.34em;
     letter-spacing: 0.01em;
     color: var(--hero-ink);
     text-shadow: 0 2px 26px oklch(20% 0.02 150 / 0.55);
@@ -418,12 +422,11 @@ const nav = [
 </style>
 
 <script>
-  // Progressive enhancement: drive the in-place crossfade from scroll position.
+  // Drive the in-place crossfade from scroll position.
   const section = document.querySelector<HTMLElement>('.intro');
   const about = document.querySelector<HTMLElement>('.intro__layer--about');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (section && about && !reduce) {
+  if (section && about) {
     const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
     let ticking = false;
 
