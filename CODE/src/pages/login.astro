@@ -1,11 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
 
 const sent = Astro.url.searchParams.get('sent') === '1';
 const error = Astro.url.searchParams.get('error') === '1';
 ---
 
-<BaseLayout title="Sign in">
+<BaseLayout title="Sign in" themeToggle>
+  <ThemeToggle />
   <section class="login page">
     <h1 class="login__title">Sign in</h1>
     <p class="login__lead">Enter your admin email to receive a magic sign-in link.</p>

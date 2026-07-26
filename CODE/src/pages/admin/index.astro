@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ThemeToggle from '../../components/ThemeToggle.astro';
 
 const supabase = Astro.locals.supabase!;
 const user = Astro.locals.user;
@@ -17,7 +18,8 @@ const fmt = (s: string) =>
   });
 ---
 
-<BaseLayout title="Dashboard">
+<BaseLayout title="Dashboard" themeToggle>
+  <ThemeToggle />
   <section class="dash page">
     <header class="dash__head">
       <div>

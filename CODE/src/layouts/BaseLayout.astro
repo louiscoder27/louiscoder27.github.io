@@ -50,7 +50,7 @@ const scriptFontFace =
          paint so post pages never flash light before the toggle script runs. */
       themeToggle && (
         <script is:inline>
-          {`(function(){try{if(localStorage.getItem('post-theme')!=='light'){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#282B4A');}}catch(e){}})();`}
+          {`(function(){try{if(localStorage.getItem('post-theme')!=='light'){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#23212C');}}catch(e){}})();`}
         </script>
       )
     }

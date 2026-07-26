@@ -54,6 +54,18 @@ export default function Editor({ post, categories }: Props) {
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Keep the editor's light/dark theme in sync with the page toggle.
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    const read = () =>
+      setDark(document.documentElement.getAttribute('data-theme') === 'dark');
+    read();
+    const onThemeChange = (e: Event) =>
+      setDark(!!(e as CustomEvent).detail?.dark);
+    document.addEventListener('themechange', onThemeChange);
+    return () => document.removeEventListener('themechange', onThemeChange);
+  }, []);
+
   const editor = useCreateBlockNote({
     initialContent:
       post.body_json && post.body_json.length ? post.body_json : undefined,
@@ -179,7 +191,7 @@ export default function Editor({ post, categories }: Props) {
       </div>
 
       <div className="ed__editor">
-        <BlockNoteView editor={editor} />
+        <BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} />
       </div>
 
       <div className="ed__bar">

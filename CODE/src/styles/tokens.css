@@ -44,7 +44,7 @@
 
   /* ---- Home hero grade (over the fixed background photo) ---- */
   --hero-wash: color-mix(in oklch, var(--shadow-color) 14%, transparent); /* faint edge vignette */
-  --hero-scrim: color-mix(in oklch, #282b4a 72%, transparent); /* bottom darkening — navy, blends into the footer */
+  --hero-scrim: color-mix(in oklch, #23212c 72%, transparent); /* bottom darkening — Ink Void, blends into the footer */
   --hero-scrim-top: color-mix(in oklch, var(--shadow-color) 30%, transparent); /* light top darkening */
   --hero-ink: var(--color-snow); /* Snow text on the photo */
 
@@ -126,7 +126,7 @@
   --sheen-color: var(--color-light-gold);
 
   /* Reader-chosen dark ground (explicit request, outside the 5-swatch palette). */
-  --color-charcoal: #262424; /* Deep Charcoal */
+  --color-charcoal: #23212c; /* Ink Void — unified dark ground */
 
   /* ---- Surfaces now dark ---- */
   --color-paper: var(--color-charcoal); /* page ground */

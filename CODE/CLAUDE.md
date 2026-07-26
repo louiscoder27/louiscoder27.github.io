@@ -83,7 +83,10 @@ over the page is the **Astro dev toolbar** — it only appears in `dev`, never i
   swaps between tabbed `.work__view`s in place: "Latest posts" plus one view per category, each
   listing that section's posts; clicking a post leaves for `/blog/[slug]`),
   `Footer` (Ft2), `PostCard` (category/archive list rows, used on post pages),
-  `CategoryCards` (typographic section cards, currently unused by any page but kept for reuse).
+  `CategoryCards` (typographic section cards, currently unused by any page but kept for reuse),
+  `ThemeToggle` (the fixed top-right dark/light switch — used by **both** `PostLayout` and every
+  `/admin` page + `/login`, so reader and editor flip together). The admin editor island lives at
+  `src/components/admin/Editor.tsx` (+ `editor.css`).
 - **Base-path discipline** — this repo may move between a user page (`base: '/'`) and a project
   repo. Every internal link is built through a `withBase()` helper using `import.meta.env.BASE_URL`,
   so links keep working if `base` changes in `astro.config.mjs`. Follow that pattern for new links.
@@ -91,11 +94,27 @@ over the page is the **Astro dev toolbar** — it only appears in `dev`, never i
 ## Design system (Hallmark)
 
 The visual system is a **custom Hallmark theme** — stamp at the top of `src/styles/tokens.css`, log
-in `.hallmark/log.json`. Macrostructure **Stat-Led**, nav **N6 masthead**, footer **Ft2**; warm
-beige paper + navy accent; **Libre Franklin** (display/headings) + **Source Serif 4** (body). All
-colour/font/spacing/motion values are **locked CSS tokens** in `src/styles/tokens.css` — reference
-them by name (`var(--color-accent)`), never inline raw values; retheme the whole site from that one
-file. `src/styles/global.css` holds base + `.prose` (article) styles.
+in `.hallmark/log.json`. Macrostructure **Stat-Led**, nav **N6 masthead**, footer **Ft2**. The look is
+**retro/pixel**: fonts are **Press Start 2P** (`--font-display`, headings/UI), **Pixelon**
+(`--font-body`, body + article + editor content) and **Crude** (`--font-script`, the hero wordmark) —
+vendored in `public/fonts` and `@font-face`'d in `BaseLayout` (ignore the leftover Libre
+Franklin/Source Serif deps in `package.json`). Palette is the 5 swatches in `mã màu.txt` (snow paper,
+fern accent, midnight-violet ink). All colour/font/spacing/motion values are **locked CSS tokens** in
+`src/styles/tokens.css` — reference them by name (`var(--color-accent)`), never inline raw values;
+retheme the whole site from that one file. `src/styles/global.css` holds base + `.prose` (article)
+styles.
+
+**Light/dark theming.** Dark mode is opt-in per visitor via `ThemeToggle` (localStorage key
+`post-theme`, **dark is the default** on any page that renders it). It sets `data-theme="dark"` on
+`<html>`; `tokens.css` re-maps the same swatches for dark under `:root[data-theme='dark']` (ground →
+Ink Void `#23212C`, ink → snow, accent → warm gold). Reader **post pages and all admin pages** carry
+`body.post-page` (from `BaseLayout`'s `themeToggle` prop), which applies the article palette in
+`global.css`: light = Coconut `#EBE9DD` bg / Mocha `#524378` text / Olive `#A7A955` headings; dark =
+Ink Void `#23212C` bg / Vanilla Cream `#EEEBDA` text / headings keep default ink. The BlockNote
+editor mirrors these — `editor.css` maps `--bn-colors-*` onto the tokens and `Editor.tsx` syncs
+BlockNote's `theme` to the page via a `themechange` event. The home page has no toggle (always light).
+The footer band + home-hero scrim also use **Ink Void `#23212C`** (hardcoded in `Footer.astro`, and
+`--hero-scrim` / `IntroStage`), so the dark band matches the dark-mode ground everywhere.
 
 ## Deploy
 

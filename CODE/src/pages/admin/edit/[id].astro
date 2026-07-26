@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ThemeToggle from '../../../components/ThemeToggle.astro';
 import Editor from '../../../components/admin/Editor.tsx';
 import { CATEGORIES } from '../../../lib/categories';
 
@@ -41,7 +42,8 @@ if (id && id !== 'new') {
 }
 ---
 
-<BaseLayout title={post.id ? 'Edit post' : 'New post'}>
+<BaseLayout title={post.id ? 'Edit post' : 'New post'} themeToggle>
+  <ThemeToggle />
   <section class="admin page">
     <p class="admin__crumbs"><a class="link" href="/admin">← Dashboard</a></p>
     <h1 class="admin__title">{post.id ? 'Edit post' : 'New post'}</h1>
