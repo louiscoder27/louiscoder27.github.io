@@ -1,0 +1,87 @@
+---
+// Base document — fonts, tokens, global styles, footer chrome.
+import '../styles/tokens.css';
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import { SITE } from '../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  themeToggle?: boolean;
+}
+
+const { title, description, themeToggle = false } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} — ${SITE.kicker}`;
+const pageDescription = description ?? SITE.description;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// Base-path-aware @font-face for the two vendored display/body faces (public/fonts).
+// Injected here (not in a static stylesheet) so the URL follows import.meta.env.BASE_URL
+// if the repo ever moves from a user page to a project sub-path.
+const fontBase = import.meta.env.BASE_URL;
+const scriptFontFace =
+  `@font-face{font-family:'Press Start 2P';src:url('${fontBase}fonts/PressStart2P.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap;}` +
+  `@font-face{font-family:'Crude';src:url('${fontBase}fonts/Crude.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}` +
+  `@font-face{font-family:'Pixelon';src:url('${fontBase}fonts/Pixelon.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#FFFBFF" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <link rel="sitemap" href={`${import.meta.env.BASE_URL}sitemap-index.xml`} />
+    <style set:html={scriptFontFace}></style>
+    {
+      /* No-flash theme init: applies the saved reader preference before first
+         paint so post pages never flash light before the toggle script runs. */
+      themeToggle && (
+        <script is:inline>
+          {`(function(){try{if(localStorage.getItem('post-theme')!=='light'){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#282B4A');}}catch(e){}})();`}
+        </script>
+      )
+    }
+  </head>
+  <body class={themeToggle ? 'post-page' : undefined}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <style>
+      #main {
+        flex: 1 0 auto;
+      }
+      .skip-link {
+        position: absolute;
+        left: var(--space-sm);
+        top: -3rem;
+        z-index: var(--z-overlay);
+        background: var(--color-accent);
+        color: var(--color-accent-ink);
+        padding: 0.5rem 0.9rem;
+        border-radius: var(--radius-sm);
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        transition: top var(--dur-short) var(--ease-out);
+      }
+      .skip-link:focus {
+        top: var(--space-sm);
+      }
+    </style>
+  </body>
+</html>

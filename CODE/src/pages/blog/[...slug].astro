@@ -1,0 +1,29 @@
+---
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getPostBySlug } from '../../lib/posts';
+
+const { slug } = Astro.params;
+const post = slug ? await getPostBySlug(slug) : null;
+
+if (!post) {
+  return new Response(null, { status: 404, statusText: 'Post not found' });
+}
+
+// Cache the rendered page at the edge; revalidate in the background so a freshly
+// published/edited post shows up quickly without hammering the database.
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=0, s-maxage=60, stale-while-revalidate=600',
+);
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  category={post.data.category}
+  readingTime={post.data.readingTime}
+>
+  <Fragment set:html={post.body_html} />
+</PostLayout>

@@ -1,0 +1,46 @@
+[
+  {
+    "date": "2026-07-20",
+    "macrostructure": "Stat-Led",
+    "theme": "custom",
+    "theme_axes": "light / geometric-sans / cool",
+    "vibe": "bright, professional, editorial finance",
+    "nav": "N6 Newspaper masthead",
+    "footer": "Ft2 Inline-rule single line",
+    "enrichment": "none",
+    "brief": "Louis Tran · personal economics/finance blog"
+  },
+  {
+    "date": "2026-07-24",
+    "macrostructure": "Stat-Led",
+    "theme": "custom",
+    "theme_axes": "light / geometric-sans / chromatic-fern ~121°",
+    "vibe": "citrus-lime paper, fern accent, midnight-violet ink",
+    "nav": "N6 Newspaper masthead",
+    "footer": "Ft2 Inline-rule single line",
+    "enrichment": "none",
+    "brief": "Recolor to a user-supplied fixed 5-swatch palette (Lime Cream #F4FDAF, Light Gold #EFDD8D, Fern #65743A, Dark Slate Grey #394F49, Midnight Violet #210124, from \"mã màu.txt\") — no hue invented outside these 5; extra tonal steps use color-mix(..., transparent) on the same swatch"
+  },
+  {
+    "date": "2026-07-24",
+    "macrostructure": "Stat-Led",
+    "theme": "custom",
+    "theme_axes": "light / geometric-sans / chromatic-fern ~121°",
+    "vibe": "snow-white paper, fern accent, midnight-violet ink",
+    "nav": "N6 Newspaper masthead",
+    "footer": "Ft2 Inline-rule single line",
+    "enrichment": "none",
+    "brief": "Swapped the paper swatch: Lime Cream #F4FDAF -> Snow #FFFBFF (RGB 255,251,255). Same 5-swatch discipline; only the lightest swatch changed, all downstream tokens (paper, sheen-color, hero-ink, accent-ink, footer-ink) re-point automatically via the var() chain"
+  },
+  {
+    "date": "2026-07-24",
+    "macrostructure": "Stat-Led",
+    "theme": "custom",
+    "theme_axes": "light / geometric-sans / chromatic-fern ~121°",
+    "vibe": "snow-white paper, fern accent, midnight-violet ink",
+    "nav": "N6 Newspaper masthead",
+    "footer": "Ft2 Inline-rule single line",
+    "enrichment": "none",
+    "brief": "Moved --color-paper-2 and --color-glass from Light Gold to Snow, so card/raised-surface and the IntroStage glass panels match the page paper instead of a separate golden tint. Footer tokens keep Light Gold on purpose."
+  }
+]

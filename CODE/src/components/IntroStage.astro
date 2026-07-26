@@ -1,0 +1,1140 @@
+---
+// The Canva opener rebuilt as ONE pinned stage. A single fixed meadow sits
+// behind a sticky viewport; scrolling crossfades between two layers *in place*
+// on the same screen — the handwritten name dissolves out, the About cards
+// dissolve in ("mờ và rõ dần") — before the page continues to the blog content.
+import { SITE } from '../site.config';
+
+interface WorkPost {
+  title: string;
+  description: string;
+  date: string;
+  category: string;
+  href: string;
+}
+interface WorkSection {
+  name: string;
+  slug: string;
+  blurb: string;
+  count: number;
+  posts: WorkPost[];
+}
+interface Props {
+  postsCount: number;
+  projectsCount: number;
+  years: number;
+  latest: WorkPost[];
+  sections: WorkSection[];
+}
+// Stats + list data are passed in from the page so they stay derived from real content.
+const { postsCount, projectsCount, years, latest, sections } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
+
+// Uppercase-first, as written by the author: "Louis".
+const wordmark = 'Louis';
+
+// About content.
+const heading = 'Trinh Dat // Louis';
+const affiliation = 'Investments Economics';
+const bio = 'Investments student from UEH. Focus on finance, mathematics, econometrics.';
+const fields = ['Finance', 'Mathematics', 'Econometrics'];
+
+// Section navigation rail (replaces the old Sections list). Each icon links to a
+// category page; the rail is collapsed to icons and expands on hover to labels.
+const leafIcon =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20C4 13 8 5 20 4c-1 12-7 16-15 16z"/><path d="M5 20 13 12"/></svg>';
+const railIcons: Record<string, string> = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/></svg>',
+  writeups:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>',
+  courses:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7v15H6a2 2 0 0 1-2-2z"/><path d="M20 5h-7v15h5a2 2 0 0 0 2-2z"/></svg>',
+  projects:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h3l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>',
+  blog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
+};
+// The rail and bottom nav are the "tabs" that swap the content inside the work
+// box. Home shows the default "Latest posts" view; each section shows its own
+// title + post list in the same box. `key` doubles as the hash and the data-tab.
+const railItems = [
+  { label: 'Home', href: '#home', key: 'home' },
+  ...sections.map((s) => ({ label: s.name, href: `#${s.slug}`, key: s.slug })),
+];
+
+const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
+---
+
+<section id="home" class="intro" aria-label="Introduction">
+  <noscript>
+    <style>
+      /* Without JS there's no scroll crossfade — stack the two slides. */
+      .intro { height: auto !important; }
+      .intro__sticky { position: static !important; height: auto !important; }
+      .intro__layer { position: static !important; opacity: 1 !important; filter: none !important; transform: none !important; min-height: 100svh; }
+    </style>
+  </noscript>
+
+  <div class="intro__sticky">
+    <!-- Looping video backdrop — muted/inline so it autoplays everywhere; the
+         still background.jpg is the poster so there's never a blank frame while
+         the video loads (and it shows if the browser blocks autoplay). -->
+    <video
+      class="intro__video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      poster={withBase('/background.jpg')}
+      aria-hidden="true"
+    >
+      <source src={withBase('/background.mp4')} type="video/mp4" />
+    </video>
+    <div class="intro__grade" aria-hidden="true"></div>
+
+    <!-- Layer 1 — the name, revealed by a slow decoding scramble that cycles
+         between "Louis" and "Hello" forever. JS drives the per-character spans;
+         the static label keeps it accessible / correct without JS. -->
+    <div class="intro__layer intro__layer--name">
+      <h1 class="intro__mark">
+        <span class="intro__ink" data-scramble aria-hidden="true">{wordmark}</span>
+        <span class="sr-only">{wordmark}</span>
+      </h1>
+    </div>
+
+    <!-- Layer 2 — the About cards -->
+    <div class="intro__layer intro__layer--about" aria-labelledby="about-heading">
+      <h2 id="about-heading" class="sr-only">About</h2>
+      <div class="about__grid">
+        <!-- Left — identity, quick links, live stats -->
+        <article class="glass about__id">
+          <div class="about__id-top">
+            <p class="about__name">{heading}</p>
+            <p class="about__affil">{affiliation}</p>
+            <div class="about__links">
+              <a class="about__pill" href="#work">Latest posts</a>
+              <a class="about__pill" href="#work">Sections</a>
+            </div>
+          </div>
+          <div class="about__stats">
+            <div class="about__stat">
+              <span class="about__num tnum">{postsCount}</span>
+              <span class="about__lbl">Posts</span>
+            </div>
+            <div class="about__stat">
+              <span class="about__num tnum">{projectsCount}</span>
+              <span class="about__lbl">Projects</span>
+            </div>
+            <div class="about__stat">
+              <span class="about__num tnum">{years}<span class="about__unit">yr</span></span>
+              <span class="about__lbl">Active</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Right — bio + fields of study -->
+        <div class="about__side">
+          <article class="glass about__bio">
+            <p>{bio}</p>
+          </article>
+          <ul class="about__fields">
+            {fields.map((f) => <li class="glass about__field">{f}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer 3 — merged "Latest posts" + "Sections" panel -->
+    <div class="intro__layer intro__layer--work" aria-labelledby="work-heading">
+      <h2 id="work-heading" class="sr-only">Latest posts and sections</h2>
+      <div class="work glass">
+        <!-- Section navigation rail — the tabs that swap the box content below -->
+        <nav class="wnav" aria-label="Sections">
+          <a class="wnav__logo" href="#home" data-tab="home" aria-label="Home">
+            <span class="wnav__ic" set:html={leafIcon} />
+          </a>
+          <ul class="wnav__list">
+            {
+              railItems.map((it) => (
+                <li>
+                  <a class="wnav__item" href={it.href} data-tab={it.key}>
+                    <span class="wnav__ic" set:html={railIcons[it.key]} />
+                    <span class="wnav__label">{it.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <!-- One swappable view per tab. Home = latest posts; each section shows
+             its own title + posts. Only the active view is displayed. -->
+        <div class="work__body">
+          <div class="work__view is-active" data-view="home">
+            <div class="work__head">
+              <h3 class="work__title">Latest posts</h3>
+            </div>
+            <ul class="work__posts">
+              {
+                latest.map((p) => (
+                  <li>
+                    <a class="wpost" href={p.href}>
+                      <div class="wpost__main">
+                        <p class="wpost__title">{p.title}</p>
+                        <p class="wpost__desc">{p.description}</p>
+                        <p class="wpost__date">{p.date}</p>
+                      </div>
+                      <span class="wpost__cat">{p.category}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          {
+            sections.map((s) => (
+              <div class="work__view" data-view={s.slug} aria-label={s.name}>
+                <div class="work__head">
+                  <h3 class="work__title">{s.name}</h3>
+                  <span class="work__count">
+                    {s.count} {s.count === 1 ? 'essay' : 'essays'}
+                  </span>
+                </div>
+                {s.posts.length > 0 ? (
+                  <ul class="work__posts">
+                    {s.posts.map((p) => (
+                      <li>
+                        <a class="wpost" href={p.href}>
+                          <div class="wpost__main">
+                            <p class="wpost__title">{p.title}</p>
+                            <p class="wpost__desc">{p.description}</p>
+                            <p class="wpost__date">{p.date}</p>
+                          </div>
+                          <span class="wpost__cat">{p.category}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="work__empty">
+                    Nothing here yet — the first essay in this section is on its way.
+                  </p>
+                )}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Persistent footer — same quote + nav on both slides -->
+    <div class="intro__bar">
+      {
+        SITE.hero.quotes.length > 0 && (
+          <div class="intro__quotes">
+            {SITE.hero.quotes.map((q) => (
+              <p class="intro__quote">{q}</p>
+            ))}
+          </div>
+        )
+      }
+      <nav class="intro__nav" aria-label="Primary">
+        {
+          nav.map((item, i) => (
+            <>
+              {i > 0 && <span class="intro__sep" aria-hidden="true">·</span>}
+              <a class="intro__link" href={item.href} data-tab={item.key}>{item.label}</a>
+            </>
+          ))
+        }
+      </nav>
+    </div>
+  </div>
+
+  <!-- Scroll targets for nav/links — each lands where its slide is shown. -->
+  <span id="about" class="intro__anchor" style="top: 26%" aria-hidden="true"></span>
+  <span id="work" class="intro__anchor" style="top: 66%" aria-hidden="true"></span>
+</section>
+
+<style is:global>
+  @property --write {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 100;
+  }
+</style>
+
+<style define:vars={{ meadow: `url('${withBase('/background.jpg')}')` }}>
+  /* Tall so there's scroll travel to drive the crossfade; the sticky child
+     stays pinned to the viewport the whole way (one screen, no page change). */
+  .intro {
+    position: relative;
+    height: 380svh;
+    background: var(--color-ink);
+  }
+  .intro__anchor {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .intro__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    isolation: isolate;
+    /* Fixed painterly meadow — locked to the viewport (Canva slide feel). */
+    background-image: var(--meadow);
+    background-size: cover;
+    background-position: 50% 50%;
+    background-attachment: fixed;
+    color: var(--hero-ink);
+  }
+
+  /* Looping video backdrop — covers the sticky viewport, sits at the very back
+     (below the vignette at z-index 0 and all content at z-index 1). The still
+     background.jpg on .intro__sticky shows through if the video ever fails. */
+  .intro__video {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+    pointer-events: none;
+  }
+
+  .intro__grade {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(120% 90% at 50% 42%, transparent 58%, var(--hero-wash) 100%),
+      linear-gradient(to bottom, transparent 58%, var(--hero-scrim) 100%);
+    pointer-events: none;
+  }
+
+  /* Both layers occupy the same centred viewport box — one crossfades into the
+     other in place. In the no-JS/static fallback they simply stack. */
+  .intro__layer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: clamp(3rem, 8vh, 6rem) var(--page-gutter) clamp(6rem, 14vh, 9rem);
+  }
+  .intro__layer--name {
+    opacity: var(--name-op, 1);
+  }
+  .intro__layer--about {
+    opacity: var(--about-op, 0);
+    filter: blur(calc((1 - var(--about-op, 0)) * 16px));
+    transform: scale(calc(0.97 + var(--about-op, 0) * 0.03));
+    pointer-events: none;
+  }
+  .intro__layer--about.is-active {
+    pointer-events: auto;
+  }
+  .intro__layer--work {
+    opacity: var(--work-op, 0);
+    filter: blur(calc((1 - var(--work-op, 0)) * 16px));
+    transform: scale(calc(0.97 + var(--work-op, 0) * 0.03));
+    pointer-events: none;
+  }
+  .intro__layer--work.is-active {
+    pointer-events: auto;
+  }
+
+  /* ---- The scrambling wordmark (Crude font) ---- */
+  .intro__mark {
+    margin: 0;
+    line-height: 1.15;
+    text-align: center;
+  }
+  .intro__ink {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    align-items: baseline;
+    font-family: var(--font-crude);
+    font-weight: 400;
+    /* ▼▼ ĐỔI KÍCH THƯỚC CHỮ "LOUIS/HELLO" TẠI ĐÂY ▼▼
+       clamp(nhỏ-nhất-trên-mobile, co-giãn-theo-màn-hình, lớn-nhất-trên-desktop)
+       Muốn chữ nhỏ lại: giảm cả 3 số, ví dụ clamp(3rem, 12vw, 9rem). */
+    font-size: clamp(2.5rem, 10vw, 7rem);
+    /* ▲▲ ---------------------------------------- ▲▲ */
+    line-height: 1.3;
+    padding: 0.14em 0.16em 0.24em;
+    letter-spacing: 0.02em;
+    color: var(--hero-ink);
+    text-shadow: 0 2px 26px color-mix(in oklch, var(--shadow-color) 55%, transparent);
+  }
+  /* Each character is its own cell so scramble glyphs of different widths don't
+     shove the line around — a fixed min-width keeps positions calm and steady. */
+  .intro__char {
+    display: inline-block;
+    min-width: 0.62em;
+    text-align: center;
+    /* When a settled char is un-flashed, it eases from the accent back to snow,
+       giving the "lock" a soft glow that fades rather than a hard blink. */
+    transition:
+      color 620ms var(--ease-out),
+      text-shadow 620ms var(--ease-out);
+  }
+  /* Mid-scramble glyphs sit slightly dimmer so the locked letters read first. */
+  .intro__char--scramble {
+    color: color-mix(in oklch, var(--hero-ink) 62%, transparent);
+  }
+  /* The instant a character locks into place — a gentle warm-gold accent glow. */
+  .intro__char--lock {
+    color: var(--color-light-gold);
+    text-shadow:
+      0 0 18px color-mix(in oklch, var(--color-light-gold) 70%, transparent),
+      0 2px 26px color-mix(in oklch, var(--shadow-color) 55%, transparent);
+  }
+
+  /* ---- About cards ---- */
+  .about__grid {
+    width: 100%;
+    max-width: var(--content-max);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: stretch;
+  }
+  .glass {
+    margin: 0;
+    background: color-mix(in srgb, var(--color-glass) calc(var(--glass-alpha) * 100%), transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid color-mix(in oklch, var(--sheen-color) 35%, transparent);
+    border-radius: var(--radius-lg);
+    /* Deeper, layered shadow so the cards lift off the meadow. */
+    box-shadow:
+      0 34px 80px color-mix(in oklch, var(--shadow-color) 42%, transparent),
+      0 12px 28px color-mix(in oklch, var(--shadow-color) 26%, transparent);
+  }
+  /* ---- Left: identity card (name, quick links, stats) ---- */
+  .about__id {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(1.5rem, 5vh, 3rem);
+    padding: clamp(1.75rem, 4vw, 3.25rem);
+  }
+  .about__name {
+    margin: 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(1.85rem, 4.4vw, 3rem);
+    line-height: 1.03;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .about__affil {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1rem, 2.2vw, 1.375rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .about__links {
+    margin-top: clamp(1rem, 3vh, 1.75rem);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+  .about__pill {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    padding: 0.6rem 1.15rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-glass) 82%, transparent);
+    border: 1px solid color-mix(in oklch, var(--sheen-color) 40%, transparent);
+    box-shadow: 0 6px 16px color-mix(in oklch, var(--shadow-color) 18%, transparent);
+    transition: transform var(--dur-short) var(--ease-out),
+      background-color var(--dur-short) var(--ease-out);
+  }
+  .about__pill:hover {
+    transform: translateY(-2px);
+    background: color-mix(in srgb, var(--color-glass) 95%, transparent);
+  }
+
+  /* Stats row (numbers stay derived from real content) */
+  .about__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1rem, 4vw, 2.5rem);
+    font-family: var(--font-body);
+    font-style: italic;
+  }
+  .about__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .about__num {
+    font-weight: 700;
+    font-size: clamp(2.1rem, 4.6vw, 3.1rem);
+    line-height: 1;
+    color: var(--color-ink);
+  }
+  .about__unit {
+    font-size: 0.5em;
+    margin-left: 0.06em;
+  }
+  .about__lbl {
+    margin-top: var(--space-3xs);
+    font-size: var(--text-sm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  /* ---- Right: bio card + fields of study ---- */
+  .about__side {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.9rem, 2vw, 1.5rem);
+  }
+  .about__bio {
+    padding: clamp(1.5rem, 3.5vw, 2.25rem);
+  }
+  .about__bio p {
+    margin: 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 1.7vw, 1.25rem);
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .about__fields {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.9rem, 2vw, 1.5rem);
+  }
+  .about__field {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 3.25rem;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    /* Lighter than the big cards. */
+    box-shadow: 0 10px 24px color-mix(in oklch, var(--shadow-color) 22%, transparent);
+  }
+
+  /* ---- Layer 3: latest-post boxes + section-nav rail ---- */
+  .work {
+    position: relative;
+    width: 100%;
+    max-width: min(94vw, 72rem);
+    min-height: min(64vh, 34rem);
+    max-height: min(82vh, 40rem); /* bound the box so long lists scroll inside it */
+    display: flex;
+    align-items: stretch;
+    padding: clamp(1.1rem, 2.4vw, 1.9rem);
+    padding-left: clamp(4.75rem, 7vw, 6rem); /* clearance for the collapsed rail */
+  }
+
+  /* Vertical nav rail — collapsed to icons, expands on hover to reveal labels. */
+  .wnav {
+    position: absolute;
+    top: clamp(1.1rem, 2.4vw, 1.9rem);
+    left: clamp(1.1rem, 2.4vw, 1.9rem);
+    bottom: clamp(1.1rem, 2.4vw, 1.9rem);
+    width: clamp(3.25rem, 4vw, 3.75rem);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1.4vh, 1rem);
+    padding: 0.6rem;
+    border-radius: 1.9rem;
+    background: color-mix(in oklch, #282b4a 60%, transparent); /* navy — matches the footer */
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in oklch, var(--sheen-color) 22%, transparent);
+    box-shadow: 0 18px 40px color-mix(in oklch, var(--shadow-color) 45%, transparent);
+    overflow: hidden;
+    /* Slightly slower, gentler open/close. */
+    transition: width 440ms var(--ease-out);
+  }
+  .wnav:hover,
+  .wnav:focus-within {
+    width: clamp(11rem, 16vw, 13rem);
+  }
+  .wnav__logo,
+  .wnav__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 999px;
+    color: var(--sheen-color);
+    white-space: nowrap;
+    transition: background-color var(--dur-short) var(--ease-out);
+  }
+  .wnav__logo { margin-bottom: 0.3rem; }
+  .wnav:hover .wnav__logo,
+  .wnav:hover .wnav__item,
+  .wnav:focus-within .wnav__logo,
+  .wnav:focus-within .wnav__item {
+    justify-content: flex-start;
+  }
+  .wnav__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+  .wnav__item:hover,
+  .wnav__logo:hover {
+    background: color-mix(in oklch, var(--sheen-color) 16%, transparent);
+  }
+  /* Active tab (the view currently shown in the box) — solid warm gold so it
+     clearly stands out against the dark rail, not the muted fern accent. */
+  .wnav__item[data-current],
+  .wnav__item[data-current]:hover {
+    background: var(--color-light-gold);
+    color: var(--color-ink);
+    box-shadow: 0 4px 14px color-mix(in oklch, var(--color-light-gold) 45%, transparent);
+  }
+  .wnav__ic {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+  }
+  .wnav__ic :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .wnav__logo .wnav__ic {
+    background: color-mix(in oklch, var(--sheen-color) 92%, transparent);
+    border-radius: 999px;
+    color: var(--color-slate);
+  }
+  .wnav__label {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    max-width: 0;
+    margin-left: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: max-width 440ms var(--ease-out),
+      margin-left 440ms var(--ease-out),
+      opacity 300ms var(--ease-out),
+      transform 300ms var(--ease-out);
+  }
+  .wnav:hover .wnav__label,
+  .wnav:focus-within .wnav__label {
+    max-width: 10rem;
+    margin-left: 0.8rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Latest posts */
+  .work__body {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(0.9rem, 2.2vh, 1.5rem);
+    padding-left: clamp(0.75rem, 2vw, 1.5rem);
+    overflow: hidden;
+  }
+  .work__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 2px solid color-mix(in oklch, var(--color-fern) 40%, transparent);
+  }
+  .work__title {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 2.4vw, 1.75rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .work__count {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+  /* Swappable tab views — only the active one shows in the box. */
+  .work__view {
+    display: none;
+    flex-direction: column;
+    gap: clamp(0.9rem, 2.2vh, 1.5rem);
+    min-height: 0;
+  }
+  .work__view.is-active {
+    display: flex;
+  }
+  .work__empty {
+    margin: 0;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-md);
+    color: var(--color-ink-2);
+  }
+  .work__posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.75rem, 1.8vh, 1.25rem);
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .wpost {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: clamp(0.85rem, 2vh, 1.35rem) clamp(1rem, 2.2vw, 1.5rem);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-glass) 52%, transparent);
+    border: 1px solid color-mix(in oklch, var(--sheen-color) 30%, transparent);
+    box-shadow: 0 8px 20px color-mix(in oklch, var(--shadow-color) 18%, transparent);
+    transition: transform var(--dur-short) var(--ease-out),
+      box-shadow var(--dur-short) var(--ease-out);
+  }
+  .wpost:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px color-mix(in oklch, var(--shadow-color) 30%, transparent);
+  }
+  .wpost__main { min-width: 0; }
+  .wpost__title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 2vw, 1.4rem);
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
+  .wpost__desc {
+    margin: 0.4rem 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .wpost__date {
+    margin: 0.55rem 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .wpost__cat {
+    flex-shrink: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--sheen-color) 42%, transparent);
+    border: 1px solid color-mix(in oklch, var(--sheen-color) 50%, transparent);
+    white-space: nowrap;
+  }
+
+  /* Narrow: rail becomes a horizontal strip above the content. */
+  @media (max-width: 720px) {
+    .work {
+      flex-direction: column;
+      padding-left: clamp(1.1rem, 2.4vw, 1.9rem);
+    }
+    .wnav {
+      position: static;
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .wnav:hover,
+    .wnav:focus-within { width: 100%; }
+    .wnav__list { flex-direction: row; }
+    .wnav__label { display: none; }
+    .work__body { padding-left: 0; }
+  }
+
+  /* ---- Persistent footer ---- */
+  .intro__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(1.5rem, 4vw, 3rem);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    text-align: center;
+    padding-inline: var(--page-gutter);
+    animation: intro-rise var(--dur-long) var(--ease-out) 2200ms both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .intro__bar { animation: none; }
+  }
+  .intro__quotes {
+    max-width: 60ch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+  .intro__quote {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--hero-ink);
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 18px color-mix(in oklch, var(--shadow-color) 60%, transparent);
+  }
+  .intro__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: var(--space-sm);
+  }
+  .intro__sep {
+    color: var(--hero-ink);
+    opacity: 0.5;
+  }
+  .intro__link {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--hero-ink);
+    white-space: nowrap;
+    padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--dur-short) var(--ease-out);
+    text-shadow: 0 1px 18px color-mix(in oklch, var(--shadow-color) 60%, transparent);
+  }
+  .intro__link:hover {
+    border-bottom-color: var(--hero-ink);
+  }
+  /* Active item in the bottom nav — warm gold to match the rail's active tab. */
+  .intro__link[data-current] {
+    color: var(--color-light-gold);
+    border-bottom-color: var(--color-light-gold);
+  }
+  .intro__link:focus-visible {
+    outline: 2px solid var(--hero-ink);
+    outline-offset: 3px;
+  }
+
+  @keyframes intro-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* iOS ignores background-attachment: fixed — fall back to a normal cover. */
+  @supports (-webkit-touch-callout: none) {
+    .intro__sticky { background-attachment: scroll; }
+  }
+
+  @media (min-width: 880px) {
+    .about__grid {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+      align-items: stretch;
+    }
+  }
+</style>
+
+<script>
+  // ---- Decoding-scramble wordmark ----
+  // A calm, slow "decode" reveal that cycles between two words forever:
+  // scrambled glyphs settle — out of order, one cell at a time — into "Louis",
+  // hold, then re-scramble and settle into "Hello", and repeat. Tuned for a
+  // relaxed feel: unhurried glyph flips (~10/sec), a soft accent glow as each
+  // cell locks, no strobing.
+  const scrambleEl = document.querySelector<HTMLElement>('.intro__ink[data-scramble]');
+  if (scrambleEl) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const WORDS = ['Louis', 'Hello'];
+
+    if (reduce) {
+      // Respect reduced-motion: no scramble, just the first word, held.
+      scrambleEl.textContent = WORDS[0];
+    } else {
+      // Pre-decode "noise" glyphs. Restricted to characters that actually exist
+      // in the Crude font so every frame renders in the same face (no fallback
+      // glyphs sneaking in). Crude's set: A–Z a–z 0–9 ! # $ % ( ) + , - . : ; = ? @ [ ] _ { }
+      const GLYPHS = [
+        ...'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%()+,-.:;=?@[]_{}',
+      ];
+      const rand = <T,>(a: T[]): T => a[(Math.random() * a.length) | 0];
+
+      const DWELL = 2600; // ms to hold a fully-decoded word before re-scrambling
+      const SETTLE_MIN = 1000; // ms — earliest a cell locks in
+      const SETTLE_SPREAD = 1500; // ms — extra random window so cells lock out of order
+      const FLIP_MIN = 70; // ms between glyph flips (slow, non-strobing)
+      const FLIP_SPREAD = 90;
+      const FRESH = 520; // ms the warm "just locked" accent stays before fading
+
+      interface Slot {
+        span: HTMLSpanElement;
+        to: string;
+        end: number; // timestamp this cell locks
+        nextFlip: number;
+        locked: boolean;
+        freshUntil: number;
+      }
+
+      let slots: Slot[] = [];
+      let prev = '';
+      let phase: 'decode' | 'hold' = 'decode';
+      let holdUntil = 0;
+      let wordIndex = 0;
+
+      const build = (target: string) => {
+        const now = performance.now();
+        const len = Math.max(target.length, prev.length, 1);
+        scrambleEl.textContent = '';
+        slots = [];
+        for (let i = 0; i < len; i++) {
+          const span = document.createElement('span');
+          span.className = 'intro__char intro__char--scramble';
+          span.textContent = rand(GLYPHS);
+          scrambleEl.appendChild(span);
+          slots.push({
+            span,
+            to: target[i] ?? '',
+            end: now + SETTLE_MIN + Math.random() * SETTLE_SPREAD,
+            nextFlip: now,
+            locked: false,
+            freshUntil: 0,
+          });
+        }
+      };
+
+      const frame = (now: number) => {
+        if (phase === 'decode') {
+          let allLocked = true;
+          for (const s of slots) {
+            if (s.locked) {
+              if (s.freshUntil && now >= s.freshUntil) {
+                s.span.classList.remove('intro__char--lock');
+                s.freshUntil = 0;
+              }
+              continue;
+            }
+            if (now >= s.end) {
+              // Lock this cell into its final letter with a soft accent flash.
+              s.locked = true;
+              if (s.to === '') {
+                s.span.remove();
+              } else {
+                s.span.textContent = s.to;
+                s.span.classList.remove('intro__char--scramble');
+                s.span.classList.add('intro__char--lock');
+                s.freshUntil = now + FRESH;
+              }
+            } else {
+              allLocked = false;
+              if (now >= s.nextFlip) {
+                s.span.textContent = rand(GLYPHS);
+                s.nextFlip = now + FLIP_MIN + Math.random() * FLIP_SPREAD;
+              }
+            }
+          }
+          if (allLocked) {
+            prev = WORDS[wordIndex];
+            phase = 'hold';
+            holdUntil = now + DWELL;
+          }
+        } else {
+          // Holding the decoded word — just let any lingering lock-glow fade out.
+          for (const s of slots) {
+            if (s.freshUntil && now >= s.freshUntil) {
+              s.span.classList.remove('intro__char--lock');
+              s.freshUntil = 0;
+            }
+          }
+          if (now >= holdUntil) {
+            wordIndex = (wordIndex + 1) % WORDS.length;
+            build(WORDS[wordIndex]);
+            phase = 'decode';
+          }
+        }
+        requestAnimationFrame(frame);
+      };
+
+      build(WORDS[0]);
+      requestAnimationFrame(frame);
+    }
+  }
+
+  // Drive a three-stage in-place crossfade from scroll position:
+  // name → about → work, each dissolving into the next over the fixed meadow.
+  const section = document.querySelector<HTMLElement>('.intro');
+  const about = document.querySelector<HTMLElement>('.intro__layer--about');
+  const work = document.querySelector<HTMLElement>('.intro__layer--work');
+
+  if (section && about && work) {
+    const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const travel = section.offsetHeight - window.innerHeight;
+      const scrolled = Math.min(Math.max(-section.getBoundingClientRect().top, 0), travel);
+      const p = travel > 0 ? scrolled / travel : 0;
+
+      // Stage 1: name fades out (gone by ~17%).
+      const nameOp = 1 - clamp((p - 0.04) / 0.13);
+      // Stage 2: about fades in (~14%→26%), holds, fades out (~44%→56%).
+      const aboutOp = Math.min(clamp((p - 0.14) / 0.12), 1 - clamp((p - 0.44) / 0.12));
+      // Stage 3: work panel fades in (~58%→72%) and holds to the end.
+      const workOp = clamp((p - 0.58) / 0.14);
+
+      section.style.setProperty('--name-op', nameOp.toFixed(3));
+      section.style.setProperty('--about-op', aboutOp.toFixed(3));
+      section.style.setProperty('--work-op', workOp.toFixed(3));
+      about.classList.toggle('is-active', aboutOp > 0.5);
+      work.classList.toggle('is-active', workOp > 0.5);
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  }
+
+  // ---- Tabbed content inside the work box ----
+  // The rail, the bottom nav, and deep-links from post pages all set the URL
+  // hash (#writeups …); this swaps which view shows in the box, in place. Only
+  // "Home" points at a real element (#home), so category hashes never trigger a
+  // native scroll — we control the reveal ourselves.
+  const body = document.querySelector<HTMLElement>('.work__body');
+  const views = body ? Array.from(body.querySelectorAll<HTMLElement>('.work__view')) : [];
+  const tabLinks = Array.from(document.querySelectorAll<HTMLElement>('[data-tab]'));
+
+  // After a mouse click, a rail link keeps :focus, which holds the rail open
+  // (via :focus-within) until you click elsewhere. Drop focus so the rail
+  // collapses as soon as the pointer leaves it.
+  document.querySelectorAll<HTMLElement>('.wnav a').forEach((link) => {
+    link.addEventListener('click', () => {
+      requestAnimationFrame(() => link.blur());
+    });
+  });
+
+  if (section && views.length) {
+    const hasView = (key: string) => views.some((v) => v.dataset.view === key);
+
+    const setView = (key: string) => {
+      const active = hasView(key) ? key : 'home';
+      views.forEach((v) => v.classList.toggle('is-active', v.dataset.view === active));
+      tabLinks.forEach((a) =>
+        a.toggleAttribute('data-current', a.dataset.tab === active && active !== 'home'),
+      );
+    };
+
+    // Scroll the sticky stage so the work box is fully revealed (progress ~0.92).
+    const revealWork = (smooth: boolean) => {
+      const travel = section.offsetHeight - window.innerHeight;
+      if (travel <= 0) return;
+      window.scrollTo({
+        top: section.offsetTop + travel * 0.92,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    };
+
+    const applyHash = (opts: { scroll?: boolean; smooth?: boolean } = {}) => {
+      const key = (location.hash || '').replace('#', '');
+      const isSection = key && key !== 'home' && hasView(key);
+      setView(isSection ? key : 'home');
+      if (isSection && opts.scroll) revealWork(opts.smooth ?? false);
+    };
+
+    window.addEventListener('hashchange', () => applyHash({ scroll: true, smooth: true }));
+    // Honour a deep-linked section on first load (e.g. /#writeups from a post).
+    applyHash({ scroll: true, smooth: false });
+  }
+</script>

@@ -1,0 +1,154 @@
+/* Hallmark · macrostructure: Stat-Led · N6 masthead · Ft2 inline-rule footer
+ * theme: custom · vibe: "snow-white paper, fern accent, midnight-violet ink" · paper: oklch(99.23% 0.0067 325.6) · accent: oklch(53.25% 0.084 121.2)
+ * display: Press Start 2P · body: Pixelon · wordmark: Crude · axes: light / geometric-sans / chromatic-fern ~121°
+ * studied: no · context: explicit (user-supplied 5-swatch palette, see "mã màu.txt") · v1.3.0
+ * Locked tokens — every colour/font/space in the build references a name below. No inline values.
+ *
+ * Palette constraint: this build uses ONLY the 5 swatches below — no other hue was invented.
+ * Where the usual Hallmark recipe wants more tonal steps than 5 colours provide (paper-3,
+ * hairline dividers, glass, hero scrims, footer washes, card shadows/sheens), the SAME swatch is
+ * reused at reduced alpha via color-mix(..., transparent) rather than blending two different
+ * swatches together or inventing a new OKLCH value.
+ */
+
+:root {
+  /* ---- The 5 source swatches (from mã màu.txt), converted to OKLCH ---- */
+  --color-snow: oklch(99.23% 0.0067 325.6); /* Snow #FFFBFF */
+  --color-light-gold: oklch(89.46% 0.1020 97.0); /* Light Gold #EFDD8D */
+  --color-fern: oklch(53.25% 0.0840 121.2); /* Fern #65743A */
+  --color-slate: oklch(40.73% 0.0290 176.1); /* Dark Slate Grey #394F49 */
+  --color-violet: oklch(17.85% 0.0798 324.6); /* Midnight Violet #210124 */
+
+  /* Reused as the base hue for every translucent shadow / light-sheen effect below,
+     so those effects stay traceable to one named swatch instead of a one-off value. */
+  --shadow-color: var(--color-violet);
+  --sheen-color: var(--color-snow);
+
+  /* ---- Paper (light surfaces) ---- */
+  --color-paper: var(--color-snow);
+  --color-paper-2: var(--color-snow); /* card / raised surface */
+  --color-paper-3: color-mix(in oklch, var(--color-slate) 14%, transparent); /* code blocks */
+
+  --color-ink: var(--color-violet); /* primary text */
+  --color-ink-2: var(--color-slate); /* secondary text */
+
+  --color-rule: var(--color-fern); /* hairline dividers — shares the accent hue by design */
+  --color-muted: var(--color-slate); /* de-emphasised text / labels */
+
+  --color-accent: var(--color-fern); /* links, active states — the palette's one chromatic mid-tone */
+  --color-accent-strong: var(--color-slate); /* hover/pressed — darker, higher-contrast than accent */
+  --color-accent-tint: color-mix(in oklch, var(--color-fern) 14%, transparent); /* pale wash for card accents */
+  --color-accent-ink: var(--color-snow); /* light text on an accent (Fern) fill */
+
+  --color-focus: var(--color-violet); /* focus ring — darkest, most visible on any surface */
+
+  /* ---- Home hero grade (over the fixed background photo) ---- */
+  --hero-wash: color-mix(in oklch, var(--shadow-color) 14%, transparent); /* faint edge vignette */
+  --hero-scrim: color-mix(in oklch, #282b4a 72%, transparent); /* bottom darkening — navy, blends into the footer */
+  --hero-scrim-top: color-mix(in oklch, var(--shadow-color) 30%, transparent); /* light top darkening */
+  --hero-ink: var(--color-snow); /* Snow text on the photo */
+
+  /* ---- Glass (translucent about cards over the garden photo) ---- */
+  --color-glass: var(--color-snow);
+  --glass-alpha: 0.6; /* author-specified 60% opacity */
+
+  /* ---- Type ---- */
+  --font-display: 'Press Start 2P', ui-sans-serif, system-ui, sans-serif; /* headings / titles */
+  --font-body: 'Pixelon', ui-sans-serif, system-ui, sans-serif; /* body text */
+  --font-script: 'Crude', ui-sans-serif, system-ui, sans-serif; /* "Louis" hero wordmark */
+  --font-crude: 'Crude', ui-sans-serif, system-ui, sans-serif; /* "Louis" scramble hero wordmark */
+
+  /* Type scale — major third (1.25) from a 16px base */
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 1rem;
+  --text-md: 1.1875rem;
+  --text-lg: 1.4375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.1875rem;
+  --text-3xl: 2.75rem;
+  --text-4xl: 3.4375rem;
+  --text-display: clamp(2.75rem, 5vw + 1rem, 5rem);
+  --text-stat: clamp(3rem, 6vw + 0.5rem, 5.5rem); /* the lead figures */
+
+  /* ---- Spacing — 4pt scale ---- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+  --space-3xl: 9rem;
+
+  --page-gutter: clamp(1.25rem, 5vw, 4rem);
+  --measure: 68ch; /* reading measure for long-form body */
+  --content-max: 72rem; /* page container */
+
+  /* ---- Rules, radius, motion ---- */
+  --rule-hair: 1px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 22px; /* translucent about cards */
+
+  --dur-instant: 90ms;
+  --dur-short: 160ms;
+  --dur-med: 280ms;
+  --dur-long: 500ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0.3);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* z-scale */
+  --z-base: 1;
+  --z-header: 50;
+  --z-overlay: 100;
+
+  /* ---- Footer (dark band, sits flush under the page — no paper gap) ---- */
+  --color-footer-bg: var(--color-ink); /* matches the hero's dark ground for a seamless join */
+  --color-footer-ink: var(--color-accent-ink); /* Snow wordmark on the dark fill */
+  --color-footer-muted: color-mix(in oklch, var(--color-light-gold) 78%, transparent); /* dimmed body text on dark */
+  --color-footer-rule: color-mix(in oklch, var(--color-light-gold) 35%, transparent); /* hairline separators on dark */
+  --color-footer-link: var(--color-light-gold); /* warm-gold link, readable on dark */
+}
+
+/* ---- Dark theme (post pages only) ---------------------------------------
+ * The reader's dark-mode override. Applied by adding data-theme="dark" to
+ * <html>; only the per-post toggle sets it. Every value below is the SAME
+ * 5 locked swatches as light mode, re-mapped so the ground goes dark and the
+ * ink goes light (the light theme, inverted). Warm Light Gold takes over as
+ * the readable accent on the dark ground — the exact move the footer already
+ * makes in light mode.
+ */
+:root[data-theme='dark'] {
+  --shadow-color: var(--color-violet);
+  --sheen-color: var(--color-light-gold);
+
+  /* Reader-chosen dark ground (explicit request, outside the 5-swatch palette). */
+  --color-charcoal: #262424; /* Deep Charcoal */
+
+  /* ---- Surfaces now dark ---- */
+  --color-paper: var(--color-charcoal); /* page ground */
+  --color-paper-2: color-mix(in oklch, var(--color-slate) 22%, var(--color-charcoal)); /* raised card */
+  --color-paper-3: color-mix(in oklch, var(--color-light-gold) 12%, transparent); /* code blocks */
+
+  /* ---- Ink now light ---- */
+  --color-ink: var(--color-snow); /* primary text */
+  --color-ink-2: color-mix(in oklch, var(--color-light-gold) 80%, var(--color-snow)); /* secondary text */
+
+  --color-rule: color-mix(in oklch, var(--color-light-gold) 34%, transparent); /* hairline dividers */
+  --color-muted: color-mix(in oklch, var(--color-light-gold) 66%, transparent); /* de-emphasised labels */
+
+  /* ---- Accent flips to warm gold (readable on the dark ground) ---- */
+  --color-accent: var(--color-light-gold); /* links, active states */
+  --color-accent-strong: var(--color-snow); /* hover/pressed — brightest */
+  --color-accent-tint: color-mix(in oklch, var(--color-light-gold) 16%, transparent); /* pale wash */
+  --color-accent-ink: var(--color-violet); /* dark text on a gold fill */
+
+  --color-focus: var(--color-light-gold); /* focus ring — most visible on dark */
+
+  /* ---- Footer stays self-consistently dark (don't follow ink→snow) ---- */
+  --color-footer-bg: color-mix(in oklch, var(--color-slate) 18%, var(--color-charcoal));
+  --color-footer-ink: var(--color-snow);
+}

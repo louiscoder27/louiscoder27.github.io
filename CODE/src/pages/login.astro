@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const sent = Astro.url.searchParams.get('sent') === '1';
+const error = Astro.url.searchParams.get('error') === '1';
+---
+
+<BaseLayout title="Sign in">
+  <section class="login page">
+    <h1 class="login__title">Sign in</h1>
+    <p class="login__lead">Enter your admin email to receive a magic sign-in link.</p>
+
+    {sent && (
+      <p class="login__note login__note--ok">
+        Check your inbox — a sign-in link is on its way.
+      </p>
+    )}
+    {error && (
+      <p class="login__note login__note--err">
+        Something went wrong. Make sure the email is your authorised admin address.
+      </p>
+    )}
+
+    <form class="login__form" method="POST" action="/api/auth/login">
+      <label class="login__label" for="email">Email</label>
+      <input
+        class="login__input"
+        id="email"
+        name="email"
+        type="email"
+        required
+        autocomplete="email"
+        placeholder="you@example.com"
+      />
+      <button class="login__btn" type="submit">Send magic link</button>
+    </form>
+
+    <p class="login__back"><a class="link" href="/">← Back to the blog</a></p>
+  </section>
+</BaseLayout>
+
+<style>
+  .login {
+    max-width: 28rem;
+    padding-block: var(--space-2xl);
+  }
+  .login__title {
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .login__lead {
+    margin-top: var(--space-sm);
+    color: var(--color-ink-2);
+  }
+  .login__note {
+    margin-top: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+  }
+  .login__note--ok {
+    background: color-mix(in oklch, var(--color-accent) 12%, transparent);
+    color: var(--color-accent);
+  }
+  .login__note--err {
+    background: color-mix(in oklch, crimson 12%, transparent);
+    color: crimson;
+  }
+  .login__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-top: var(--space-lg);
+  }
+  .login__label {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .login__input {
+    padding: 0.7rem 0.9rem;
+    font-size: var(--text-md);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-sm);
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+  }
+  .login__input:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+  .login__btn {
+    margin-top: var(--space-xs);
+    padding: 0.7rem 1rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--color-accent-ink);
+    background: var(--color-accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .login__btn:hover {
+    filter: brightness(1.05);
+  }
+  .login__back {
+    margin-top: var(--space-lg);
+    font-size: var(--text-sm);
+  }
+</style>

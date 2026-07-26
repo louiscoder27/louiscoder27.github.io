@@ -1,0 +1,206 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { categorySlug } from '../lib/categories';
+import type { Category } from '../lib/categories';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  category: Category;
+  readingTime?: string;
+}
+const { title, description, pubDate, updatedDate, category, readingTime } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// The blog archive/category pages are gone — those sections now live as in-page
+// panels on the home page, addressed by hash (#writeups …).
+const homeHref = withBase('/');
+const sectionHref = `${homeHref}#${categorySlug(category)}`;
+---
+
+<BaseLayout title={title} description={description} themeToggle>
+  <article class="post">
+    <button
+      id="theme-toggle"
+      class="theme-toggle"
+      type="button"
+      aria-pressed="false"
+      aria-label="Switch to dark theme"
+      title="Toggle dark mode"
+    >
+      <svg class="theme-toggle__icon theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+      </svg>
+      <svg class="theme-toggle__icon theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+    <div class="page">
+      <p class="post__crumbs">
+        <a class="link" href={homeHref}>Home</a>
+        <span aria-hidden="true">/</span>
+        <a class="link" href={sectionHref}>{category}</a>
+      </p>
+
+      <header class="post__head">
+        <h1 class="post__title">{title}</h1>
+        <p class="post__dek">{description}</p>
+        <p class="post__meta tnum">
+          <time datetime={pubDate.toISOString()}>{fmt(pubDate)}</time>
+          {readingTime && <><span aria-hidden="true">·</span><span>{readingTime}</span></>}
+          {updatedDate && (
+            <><span aria-hidden="true">·</span><span>Updated {fmt(updatedDate)}</span></>
+          )}
+        </p>
+      </header>
+
+      <hr class="post__rule" />
+
+      <div class="prose">
+        <slot />
+      </div>
+
+      <hr class="post__rule post__rule--end" />
+      <p class="post__back">
+        <a class="chip" href={sectionHref}>
+          <span aria-hidden="true">←</span> Back to {category}
+        </a>
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    padding-block: var(--space-lg) 0;
+  }
+  .post__crumbs {
+    display: flex;
+    gap: var(--space-2xs);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .post__head {
+    max-width: var(--measure);
+    margin-top: var(--space-md);
+  }
+  .post__title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .post__dek {
+    margin-top: var(--space-sm);
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    font-style: italic;
+  }
+  .post__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-top: var(--space-md);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  .post__rule {
+    max-width: var(--measure);
+    margin: var(--space-lg) 0;
+    margin-inline: 0;
+  }
+  .post__rule--end {
+    margin-top: var(--space-2xl);
+  }
+  .post__back {
+    margin-bottom: var(--space-lg);
+  }
+
+  /* ---- Dark-mode toggle — fixed, top-right, post pages only ---- */
+  .theme-toggle {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: var(--z-overlay);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    color: var(--color-accent);
+    background: var(--color-paper-2);
+    border: var(--rule-hair) solid var(--color-accent);
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px color-mix(in oklch, var(--shadow-color) 18%, transparent);
+    transition: background-color var(--dur-short) var(--ease-out),
+      color var(--dur-short) var(--ease-out),
+      transform var(--dur-instant) var(--ease-out);
+  }
+  .theme-toggle:hover {
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .theme-toggle:active {
+    transform: translateY(1px);
+  }
+  .theme-toggle__icon {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+  /* Sun in light mode, Moon in dark mode. */
+  .theme-toggle__moon {
+    display: none;
+  }
+  html[data-theme='dark'] .theme-toggle__sun {
+    display: none;
+  }
+  html[data-theme='dark'] .theme-toggle__moon {
+    display: inline;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var KEY = 'post-theme';
+    function apply(dark) {
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      btn.setAttribute('aria-pressed', String(dark));
+      btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', dark ? '#282B4A' : '#EBE9DD');
+    }
+    var saved = null;
+    try {
+      saved = localStorage.getItem(KEY);
+    } catch (e) {}
+    // Dark is the default for reading a post — only an explicit 'light' opts out.
+    apply(saved !== 'light');
+    btn.addEventListener('click', function () {
+      var dark = root.getAttribute('data-theme') !== 'dark';
+      apply(dark);
+      try {
+        localStorage.setItem(KEY, dark ? 'dark' : 'light');
+      } catch (e) {}
+    });
+  })();
+</script>

@@ -1,6 +1,6 @@
 @echo off
-rem Move to this script's folder so npm runs in the project.
-cd /d "%~dp0"
+rem Move into CODE/, where the Astro project (package.json) actually lives.
+cd /d "%~dp0CODE"
 
 echo ============================================
 echo   Local preview (khong can deploy)

@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Editor from '../../../components/admin/Editor.tsx';
+import { CATEGORIES } from '../../../lib/categories';
+
+const { id } = Astro.params;
+const supabase = Astro.locals.supabase!;
+
+let post = {
+  id: null as string | null,
+  slug: '',
+  title: '',
+  description: '',
+  category: CATEGORIES[0] as string,
+  reading_time: '',
+  published: false,
+  body_json: null as any,
+  body_html: '',
+};
+
+if (id && id !== 'new') {
+  const { data } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (!data) {
+    return new Response(null, { status: 404, statusText: 'Post not found' });
+  }
+  post = {
+    id: data.id,
+    slug: data.slug,
+    title: data.title,
+    description: data.description ?? '',
+    category: data.category,
+    reading_time: data.reading_time ?? '',
+    published: data.published,
+    body_json: data.body_json,
+    body_html: data.body_html ?? '',
+  };
+}
+---
+
+<BaseLayout title={post.id ? 'Edit post' : 'New post'}>
+  <section class="admin page">
+    <p class="admin__crumbs"><a class="link" href="/admin">← Dashboard</a></p>
+    <h1 class="admin__title">{post.id ? 'Edit post' : 'New post'}</h1>
+    <Editor client:only="react" post={post} categories={[...CATEGORIES]} />
+  </section>
+</BaseLayout>
+
+<style>
+  .admin {
+    max-width: 52rem;
+    padding-block: var(--space-lg) var(--space-2xl);
+  }
+  .admin__crumbs {
+    font-size: var(--text-sm);
+  }
+  .admin__title {
+    margin: var(--space-xs) 0 var(--space-lg);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+</style>

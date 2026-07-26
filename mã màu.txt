@@ -1,0 +1,10 @@
+Dark mode:
+Midnight indigo (#EEEBDA) sử dụng màu này làm nền
+Vanilla Cream (#282B4A) nội dung post sử dụng màu này
+Các tiêu đề khác hãy giữ nguyên
+
+Light mode
+
+Coconut (#EBE9DD): sử dụng màu này làm nền
+Mocha (#524378): sử dụng màu này làm nội dung post
+Các vice header sử dụng màu Olive (#A7A955)
