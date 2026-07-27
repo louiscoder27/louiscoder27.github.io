@@ -57,6 +57,7 @@
   --font-body: 'Pixelon', ui-sans-serif, system-ui, sans-serif; /* body text */
   --font-script: 'Crude', ui-sans-serif, system-ui, sans-serif; /* "Louis" hero wordmark */
   --font-crude: 'Crude', ui-sans-serif, system-ui, sans-serif; /* "Louis" scramble hero wordmark */
+  --font-post: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, monospace; /* post title + article body */
 
   /* Type scale — major third (1.25) from a 16px base */
   --text-xs: 0.75rem;
@@ -84,6 +85,7 @@
 
   --page-gutter: clamp(1.25rem, 5vw, 4rem);
   --measure: 68ch; /* reading measure for long-form body */
+  --post-measure: min(62rem, 100%); /* wider reading frame for post pages */
   --content-max: 72rem; /* page container */
 
   /* ---- Rules, radius, motion ---- */

@@ -560,8 +560,10 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     position: relative;
     width: 100%;
     max-width: min(94vw, 72rem);
-    min-height: min(64vh, 34rem);
-    max-height: min(82vh, 40rem); /* bound the box so long lists scroll inside it */
+    /* Fixed height so the box never resizes when switching sections — sections
+       with few posts keep the same size instead of shrinking (long lists scroll
+       inside via .work__posts). */
+    height: min(82vh, 40rem);
     display: flex;
     align-items: stretch;
     padding: clamp(1.1rem, 2.4vw, 1.9rem);
@@ -651,7 +653,7 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     color: var(--color-slate);
   }
   .wnav__label {
-    font-family: var(--font-display);
+    font-family: var(--font-post);
     font-size: var(--text-sm);
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -680,10 +682,13 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     min-height: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* pin the header to the top, don't centre it */
     gap: clamp(0.9rem, 2.2vh, 1.5rem);
     padding-left: clamp(0.75rem, 2vw, 1.5rem);
-    overflow: hidden;
+    /* clip (not hidden) + a clip-margin lets the post cards' hover shadow bleed
+       past the edge a little instead of being cut off hard. */
+    overflow: clip;
+    overflow-clip-margin: 2rem;
   }
   .work__head {
     display: flex;
@@ -695,7 +700,7 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   }
   .work__title {
     font-family: var(--font-body);
-    font-weight: 700;
+    font-weight: 800;
     font-size: clamp(1.2rem, 2.4vw, 1.75rem);
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -713,13 +718,31 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   /* Swappable tab views — only the active one shows in the box. */
   .work__view {
     display: none;
+    flex: 1; /* fill the fixed-height box so the header stays pinned at the top */
     flex-direction: column;
     gap: clamp(0.9rem, 2.2vh, 1.5rem);
     min-height: 0;
   }
   .work__view.is-active {
     display: flex;
+    font-family: var(--font-post); /* JetBrains Mono, same as post pages */
   }
+  /* Every text element in the active view pins its own face, so re-point them
+     all to the mono so the whole panel reads in JetBrains Mono. */
+  .work__view.is-active .work__title,
+  .work__view.is-active .work__count,
+  .work__view.is-active .work__empty,
+  .work__view.is-active .wpost__title,
+  .work__view.is-active .wpost__desc,
+  .work__view.is-active .wpost__date,
+  .work__view.is-active .wpost__cat {
+    font-family: var(--font-post);
+  }
+  /* Tighter letter-spacing in the active view — mono already reads wide. */
+  .work__view.is-active .work__title { letter-spacing: 0.01em; }
+  .work__view.is-active .work__count { letter-spacing: 0.02em; }
+  .work__view.is-active .wpost__date { letter-spacing: 0.03em; }
+  .work__view.is-active .wpost__cat { letter-spacing: 0.03em; }
   .work__empty {
     margin: 0;
     font-family: var(--font-body);
@@ -729,11 +752,15 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   }
   .work__posts {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    /* Inner padding gives the cards' hover shadow room inside the scroll box so
+       the last (3rd) card isn't clipped at the bottom; the matching negative
+       margins keep the list flush with the header and don't add net whitespace. */
+    padding: 0.75rem 1.9rem 2.25rem;
+    margin: -0.75rem -1.9rem -1.25rem;
     display: flex;
     flex-direction: column;
     gap: clamp(0.75rem, 1.8vh, 1.25rem);
+    flex: 1; /* take the space below the header so the list scrolls, header stays put */
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -811,7 +838,8 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
       justify-content: center;
       align-items: center;
       border-radius: 999px;
-      margin-bottom: 1rem;
+      /* clear the rail's drop shadow (0 18px 40px) so it doesn't fall on the header */
+      margin-bottom: 2.5rem;
     }
     .wnav:hover,
     .wnav:focus-within { width: 100%; }

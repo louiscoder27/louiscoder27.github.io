@@ -234,6 +234,19 @@ hr {
 body.post-page {
   --color-paper: #ebe9dd; /* Coconut — page background */
 }
+/* Article body → JetBrains Mono. .prose text inherits it from .post (set in
+   PostLayout); the subheadings pin the display face via the h2/h3/h4 rule above,
+   so re-point them here. Body text/strong/em all follow the inherited face. */
+body.post-page .prose h2,
+body.post-page .prose h3,
+body.post-page .prose h4 {
+  font-family: var(--font-post);
+}
+/* Wider reading frame, centred on the page (was --measure, left-aligned). */
+body.post-page .prose {
+  max-width: var(--post-measure);
+  margin-inline: auto;
+}
 body.post-page .prose {
   color: #524378; /* Mocha — post content */
 }

@@ -67,11 +67,20 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
 <style>
   .post {
     padding-block: var(--space-lg) 0;
+    /* Whole article uses JetBrains Mono — cascades to title, dek, meta, prose. */
+    font-family: var(--font-post);
+  }
+  /* Reading column: wider than the old --measure and centred on the page. */
+  .post__crumbs,
+  .post__head,
+  .post__rule,
+  .post__back {
+    max-width: var(--post-measure);
+    margin-inline: auto;
   }
   .post__crumbs {
     display: flex;
     gap: var(--space-2xs);
-    font-family: var(--font-display);
     font-size: var(--text-xs);
     font-weight: 600;
     letter-spacing: 0.1em;
@@ -79,10 +88,10 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
     color: var(--color-muted);
   }
   .post__head {
-    max-width: var(--measure);
     margin-top: var(--space-md);
   }
   .post__title {
+    font-family: var(--font-post);
     font-size: var(--text-3xl);
     font-weight: 800;
     line-height: 1.06;
@@ -101,19 +110,19 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
     flex-wrap: wrap;
     gap: var(--space-2xs);
     margin-top: var(--space-md);
-    font-family: var(--font-display);
     font-size: var(--text-sm);
     color: var(--color-muted);
   }
   .post__rule {
-    max-width: var(--measure);
-    margin: var(--space-lg) 0;
-    margin-inline: 0;
+    margin: var(--space-lg) auto;
   }
   .post__rule--end {
     margin-top: var(--space-2xl);
   }
   .post__back {
     margin-bottom: var(--space-lg);
+  }
+  .post__back .chip {
+    font-family: var(--font-post);
   }
 </style>

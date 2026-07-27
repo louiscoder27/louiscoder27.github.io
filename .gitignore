@@ -1,0 +1,7 @@
+# Loose local assets — source images/fonts/zips, not part of the deployed site.
+# The app in CODE/ has its own copies in CODE/public/, so these don't need uploading.
+Picture/
+
+# OS / editor
+.DS_Store
+Thumbs.db

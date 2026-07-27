@@ -23,7 +23,14 @@ const fontBase = import.meta.env.BASE_URL;
 const scriptFontFace =
   `@font-face{font-family:'Press Start 2P';src:url('${fontBase}fonts/PressStart2P.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap;}` +
   `@font-face{font-family:'Crude';src:url('${fontBase}fonts/Crude.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}` +
-  `@font-face{font-family:'Pixelon';src:url('${fontBase}fonts/Pixelon.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}`;
+  `@font-face{font-family:'Pixelon';src:url('${fontBase}fonts/Pixelon.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}` +
+  // JetBrains Mono — post title + article body (public/fonts, woff2 webfonts).
+  `@font-face{font-family:'JetBrains Mono';src:url('${fontBase}fonts/JetBrainsMono-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}` +
+  `@font-face{font-family:'JetBrains Mono';src:url('${fontBase}fonts/JetBrainsMono-Italic.woff2') format('woff2');font-weight:400;font-style:italic;font-display:swap;}` +
+  `@font-face{font-family:'JetBrains Mono';src:url('${fontBase}fonts/JetBrainsMono-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap;}` +
+  `@font-face{font-family:'JetBrains Mono';src:url('${fontBase}fonts/JetBrainsMono-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap;}` +
+  `@font-face{font-family:'JetBrains Mono';src:url('${fontBase}fonts/JetBrainsMono-BoldItalic.woff2') format('woff2');font-weight:700;font-style:italic;font-display:swap;}` +
+  `@font-face{font-family:'JetBrains Mono';src:url('${fontBase}fonts/JetBrainsMono-ExtraBold.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap;}`;
 ---
 
 <!doctype html>
