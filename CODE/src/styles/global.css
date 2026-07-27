@@ -205,6 +205,17 @@ hr {
   background: none;
   padding: 0;
 }
+/* Shiki-highlighted code blocks (rendered server-side from the editor's plain
+ * code). Shiki emits light-theme colours inline and dark-theme colours as
+ * --shiki-dark CSS variables; swap to them when the reader is in dark mode. */
+html[data-theme='dark'] .prose pre.shiki,
+html[data-theme='dark'] .prose pre.shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
 .prose strong {
   font-weight: 700;
 }

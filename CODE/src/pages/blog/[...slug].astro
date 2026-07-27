@@ -1,6 +1,7 @@
 ---
 import PostLayout from '../../layouts/PostLayout.astro';
 import { getPostBySlug } from '../../lib/posts';
+import { highlightCodeBlocks } from '../../lib/highlight';
 
 const { slug } = Astro.params;
 const post = slug ? await getPostBySlug(slug) : null;
@@ -8,6 +9,9 @@ const post = slug ? await getPostBySlug(slug) : null;
 if (!post) {
   return new Response(null, { status: 404, statusText: 'Post not found' });
 }
+
+// The editor stores code blocks as plain text; colour their tokens here.
+const bodyHtml = await highlightCodeBlocks(post.body_html);
 
 // Cache the rendered page at the edge; revalidate in the background so a freshly
 // published/edited post shows up quickly without hammering the database.
@@ -25,5 +29,5 @@ Astro.response.headers.set(
   category={post.data.category}
   readingTime={post.data.readingTime}
 >
-  <Fragment set:html={post.body_html} />
+  <Fragment set:html={bodyHtml} />
 </PostLayout>
