@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 
-const sent = Astro.url.searchParams.get('sent') === '1';
 const error = Astro.url.searchParams.get('error') === '1';
 ---
 
@@ -10,16 +9,11 @@ const error = Astro.url.searchParams.get('error') === '1';
   <ThemeToggle />
   <section class="login page">
     <h1 class="login__title">Sign in</h1>
-    <p class="login__lead">Enter your admin email to receive a magic sign-in link.</p>
+    <p class="login__lead">Enter your admin email and password to sign in.</p>
 
-    {sent && (
-      <p class="login__note login__note--ok">
-        Check your inbox — a sign-in link is on its way.
-      </p>
-    )}
     {error && (
       <p class="login__note login__note--err">
-        Something went wrong. Make sure the email is your authorised admin address.
+        Incorrect email or password. Make sure you're using your authorised admin address.
       </p>
     )}
 
@@ -34,7 +28,17 @@ const error = Astro.url.searchParams.get('error') === '1';
         autocomplete="email"
         placeholder="you@example.com"
       />
-      <button class="login__btn" type="submit">Send magic link</button>
+      <label class="login__label" for="password">Password</label>
+      <input
+        class="login__input"
+        id="password"
+        name="password"
+        type="password"
+        required
+        autocomplete="current-password"
+        placeholder="••••••••"
+      />
+      <button class="login__btn" type="submit">Sign in</button>
     </form>
 
     <p class="login__back"><a class="link" href="/">← Back to the blog</a></p>
