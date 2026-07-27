@@ -8,7 +8,7 @@ import vercel from '@astrojs/vercel';
 // live from /admin and read from Supabase — no rebuild needed to publish.
 // Public pages are cached at the edge (see per-page Cache-Control headers).
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://louisblog.vercel.app',
+  site: process.env.PUBLIC_SITE_URL || 'https://louistrblog.vercel.app',
   base: '/',
   trailingSlash: 'ignore',
   output: 'server',
