@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "seed": "node scripts/seed-posts.mjs"
+    "seed": "node scripts/seed-posts.mjs",
+    "regen": "node scripts/regen-html.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.2.0",
@@ -27,6 +28,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@blocknote/server-util": "^0.25.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "gray-matter": "^4.0.3",

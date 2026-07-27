@@ -209,6 +209,44 @@ hr {
   font-weight: 700;
 }
 
+/* ---- BlockNote inline formatting (from the admin editor) --------------------
+ * The editor stores text/background colour and alignment as data-* attributes
+ * (e.g. <span data-text-color="red">), relying on stylesheet rules — not inline
+ * styles — to paint them. Re-declare BlockNote's default palette here so colours
+ * chosen in the editor also show on the public post. Values match
+ * @blocknote/core's style.css exactly. */
+.prose [data-text-color='gray'] { color: #9b9a97; }
+.prose [data-text-color='brown'] { color: #64473a; }
+.prose [data-text-color='red'] { color: #e03e3e; }
+.prose [data-text-color='orange'] { color: #d9730d; }
+.prose [data-text-color='yellow'] { color: #dfab01; }
+.prose [data-text-color='green'] { color: #4d6461; }
+.prose [data-text-color='blue'] { color: #0b6e99; }
+.prose [data-text-color='purple'] { color: #6940a5; }
+.prose [data-text-color='pink'] { color: #ad1a72; }
+
+.prose [data-background-color] {
+  padding: 0 0.15em;
+  border-radius: 3px;
+}
+.prose [data-background-color='gray'] { background-color: #ebeced; }
+.prose [data-background-color='brown'] { background-color: #e9e5e3; }
+.prose [data-background-color='red'] { background-color: #fbe4e4; }
+.prose [data-background-color='orange'] { background-color: #f6e9d9; }
+.prose [data-background-color='yellow'] { background-color: #fbf3db; }
+.prose [data-background-color='green'] { background-color: #ddedea; }
+.prose [data-background-color='blue'] { background-color: #ddebf1; }
+.prose [data-background-color='purple'] { background-color: #eae4f2; }
+.prose [data-background-color='pink'] { background-color: #f4dfeb; }
+/* The highlight tints are light; in dark mode the post's cream body text would
+ * vanish on them, so pin readable dark ink on any highlighted run (an inner
+ * data-text-color span still overrides this). */
+html[data-theme='dark'] .prose [data-background-color] { color: #23212c; }
+
+.prose [data-text-alignment='center'] { text-align: center; }
+.prose [data-text-alignment='right'] { text-align: right; }
+.prose [data-text-alignment='justify'] { text-align: justify; }
+
 .tnum {
   font-variant-numeric: tabular-nums;
 }

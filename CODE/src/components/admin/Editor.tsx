@@ -113,9 +113,14 @@ export default function Editor({ post, categories }: Props) {
     setSaving(true);
     setStatus('Saving…');
     const publishedValue = nextPublished ?? published;
+    // Export CLEAN, semantic HTML (<ul>/<ol>/<li>, <h1>, <span data-text-color>)
+    // rather than blocksToFullHTML's editor-only <div class="bn-block…"> markup.
+    // The full-HTML variant only looks right with BlockNote's own stylesheet
+    // loaded; the public reader uses the site's .prose theme instead, so lists,
+    // colours and headings would otherwise collapse to plain text there.
     let html = '';
     try {
-      html = await editor.blocksToFullHTML(editor.document);
+      html = await editor.blocksToHTMLLossy(editor.document);
     } catch {
       html = '';
     }
