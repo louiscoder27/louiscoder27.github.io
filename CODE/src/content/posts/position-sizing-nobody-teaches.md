@@ -3,7 +3,6 @@ title: "Position Sizing: The Skill Nobody Teaches"
 description: Picking the right stock matters less than deciding how much to own. A practical look at the decision that actually drives returns.
 pubDate: 2025-06-04
 category: Projects
-readingTime: 5 min read
 ---
 
 Beginners obsess over *what* to buy. Experienced investors obsess over *how much*. After years of watching my own results, I'm convinced position sizing — not stock picking — is where most individual investors quietly win or lose.

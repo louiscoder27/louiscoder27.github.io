@@ -3,7 +3,6 @@ title: Inflation Is a Distribution, Not a Number
 description: The headline CPI figure hides more than it reveals. Why the shape of inflation matters as much as its level.
 pubDate: 2026-05-09
 category: Courses
-readingTime: 5 min read
 ---
 
 When the inflation print lands each month, it gets reported as a single number. That number is an average — and averages hide the thing that actually affects people: **which prices moved, and for whom.**

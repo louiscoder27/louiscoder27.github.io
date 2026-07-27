@@ -10,9 +10,8 @@ interface Props {
   pubDate: Date;
   category: Category;
   slug: string;
-  readingTime?: string;
 }
-const { title, description, pubDate, category, slug, readingTime } = Astro.props;
+const { title, description, pubDate, category, slug } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
 const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
@@ -32,7 +31,6 @@ const dateISO = pubDate.toISOString();
   <div class="card__meta">
     <a class="card__cat" href={catHref}>{category}</a>
     <time class="card__date tnum" datetime={dateISO}>{dateLabel}</time>
-    {readingTime && <span class="card__read">{readingTime}</span>}
   </div>
   <h3 class="card__title">
     <a href={href}>{title}</a>
@@ -66,8 +64,7 @@ const dateISO = pubDate.toISOString();
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .card__date,
-  .card__read {
+  .card__date {
     color: var(--color-muted);
     font-weight: 500;
   }

@@ -15,7 +15,6 @@ export interface Post {
     pubDate: Date;
     updatedDate?: Date;
     category: Category;
-    readingTime?: string;
     published: boolean;
   };
 }
@@ -28,7 +27,6 @@ interface Row {
   description: string;
   category: Category;
   body_html: string;
-  reading_time: string | null;
   published: boolean;
   pub_date: string;
   updated_date: string | null;
@@ -45,14 +43,13 @@ export function rowToPost(row: Row): Post {
       pubDate: new Date(row.pub_date),
       updatedDate: row.updated_date ? new Date(row.updated_date) : undefined,
       category: row.category,
-      readingTime: row.reading_time ?? undefined,
       published: row.published,
     },
   };
 }
 
 const COLUMNS =
-  'id, slug, title, description, category, body_html, reading_time, published, pub_date, updated_date';
+  'id, slug, title, description, category, body_html, published, pub_date, updated_date';
 
 // All published posts, newest first. RLS on the anon client already hides
 // unpublished rows, but we filter explicitly too for clarity.

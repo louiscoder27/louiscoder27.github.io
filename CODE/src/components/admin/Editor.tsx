@@ -12,7 +12,6 @@ export interface EditorPost {
   title: string;
   description: string;
   category: string;
-  reading_time: string;
   published: boolean;
   body_json: PartialBlock[] | null;
   body_html: string;
@@ -63,7 +62,6 @@ export default function Editor({ post, categories }: Props) {
   const [slugTouched, setSlugTouched] = useState(!!post.id);
   const [description, setDescription] = useState(post.description);
   const [category, setCategory] = useState(post.category || categories[0]);
-  const [readingTime, setReadingTime] = useState(post.reading_time);
   const [published, setPublished] = useState(post.published);
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
@@ -130,7 +128,6 @@ export default function Editor({ post, categories }: Props) {
       title,
       description,
       category,
-      reading_time: readingTime,
       published: publishedValue,
       body_json: editor.document,
       body_html: html,
@@ -188,15 +185,6 @@ export default function Editor({ post, categories }: Props) {
               </option>
             ))}
           </select>
-        </label>
-
-        <label className="ed__field">
-          <span>Reading time</span>
-          <input
-            value={readingTime}
-            onChange={(e) => setReadingTime(e.target.value)}
-            placeholder="5 min read"
-          />
         </label>
 
         <label className="ed__field ed__field--wide">

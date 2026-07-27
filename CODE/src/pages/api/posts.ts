@@ -45,7 +45,6 @@ function normalise(body: Record<string, any>) {
       title,
       description: String(body.description ?? '').trim(),
       category,
-      reading_time: body.reading_time ? String(body.reading_time).trim() : null,
       published: Boolean(body.published),
       body_json: body.body_json ?? null,
       body_html: String(body.body_html ?? ''),

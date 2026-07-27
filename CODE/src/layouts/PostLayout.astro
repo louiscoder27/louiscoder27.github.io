@@ -10,9 +10,8 @@ interface Props {
   pubDate: Date;
   updatedDate?: Date;
   category: Category;
-  readingTime?: string;
 }
-const { title, description, pubDate, updatedDate, category, readingTime } = Astro.props;
+const { title, description, pubDate, updatedDate, category } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
 const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
@@ -41,7 +40,6 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
         <p class="post__dek">{description}</p>
         <p class="post__meta tnum">
           <time datetime={pubDate.toISOString()}>{fmt(pubDate)}</time>
-          {readingTime && <><span aria-hidden="true">·</span><span>{readingTime}</span></>}
           {updatedDate && (
             <><span aria-hidden="true">·</span><span>Updated {fmt(updatedDate)}</span></>
           )}

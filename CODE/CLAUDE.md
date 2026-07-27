@@ -39,7 +39,7 @@ over the page is the **Astro dev toolbar** — it only appears in `dev`, never i
 
 - **Data source (Supabase)** — posts live in the Postgres `posts` table (schema in
   `supabase/schema.sql`): `slug, title, description, category, body_json` (BlockNote document, source
-  for re-editing), `body_html` (rendered article shown on public pages), `reading_time, published,
+  for re-editing), `body_html` (rendered article shown on public pages), `published,
   pub_date, updated_date`. **RLS** lets the anon role read only `published = true`; the authenticated
   admin can do everything. Images go to the public `post-assets` storage bucket.
 - **Supabase clients** — `src/lib/supabase.ts`: `createSupabaseAnon()` (stateless, public reads) and

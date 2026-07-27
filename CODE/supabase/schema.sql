@@ -19,7 +19,6 @@ create table if not exists public.posts (
                   check (category in ('Writeups', 'Courses', 'Projects')),
   body_json     jsonb,                       -- BlockNote document (source for editing)
   body_html     text not null default '',    -- rendered HTML (shown on public pages)
-  reading_time  text,
   published     boolean not null default false,
   pub_date      timestamptz not null default now(),
   updated_date  timestamptz,

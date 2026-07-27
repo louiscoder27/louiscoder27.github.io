@@ -3,7 +3,6 @@ title: What the Yield Curve Is Actually Telling You
 description: The most-quoted recession signal in markets is really a story about expectations. Here's how to read it without the hype.
 pubDate: 2025-01-28
 category: Courses
-readingTime: 6 min read
 ---
 
 Every few months a chart of the yield curve goes viral with a caption about the next recession. The signal is real — but it's badly explained. The curve isn't a crystal ball; it's a **poll of the bond market's expectations**, and knowing what it's voting on makes it far more useful.

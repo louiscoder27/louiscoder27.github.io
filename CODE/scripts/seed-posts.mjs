@@ -69,7 +69,6 @@ for (const file of files) {
     category: data.category ?? 'Writeups',
     body_json: null,
     body_html: html,
-    reading_time: data.readingTime ?? null,
     published: data.draft ? false : true,
     pub_date: data.pubDate
       ? new Date(data.pubDate).toISOString()
