@@ -14,4 +14,8 @@ export default defineConfig({
   output: 'server',
   adapter: vercel(),
   integrations: [react(), sitemap()],
+  // Astro's default CSRF origin check falsely rejects form POSTs behind Vercel's
+  // proxy ("Cross-site POST form submissions are forbidden"). Admin actions are
+  // still guarded by the Supabase session in middleware, so disable it here.
+  security: { checkOrigin: false },
 });
