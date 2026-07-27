@@ -33,12 +33,26 @@ function slugify(input: string): string {
     .replace(/^-|-$/g, '');
 }
 
+// Read a response as JSON, but fall back to text so a non-JSON error page (a
+// 404/500 HTML page from Vercel/Astro) surfaces a useful message instead of a
+// cryptic "Unexpected token ... is not valid JSON" crash.
+async function readResponse(res: Response): Promise<any> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      error: `${res.status} ${res.statusText} — ${text.replace(/<[^>]*>/g, ' ').trim().slice(0, 140)}`,
+    };
+  }
+}
+
 // Upload an embedded image to Supabase storage via our API, return its URL.
 async function uploadFile(file: File): Promise<string> {
   const fd = new FormData();
   fd.append('file', file);
   const res = await fetch('/api/upload', { method: 'POST', body: fd });
-  const data = await res.json();
+  const data = await readResponse(res);
   if (!res.ok) throw new Error(data.error || 'Upload failed');
   return data.url as string;
 }
@@ -121,7 +135,7 @@ export default function Editor({ post, categories }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const data = await res.json();
+    const data = await readResponse(res);
     setSaving(false);
     if (!res.ok) {
       setStatus('Error: ' + (data.error || 'save failed'));
