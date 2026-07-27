@@ -2,12 +2,19 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 
-const errorParam = Astro.url.searchParams.get('error');
-// Legacy generic flag ("1") vs. a specific reason string passed by the API.
-const errorMsg =
-  errorParam === '1'
-    ? 'Incorrect email or password.'
-    : errorParam || null;
+// Map fixed error codes to messages. Only known codes render a message; any
+// unknown/attacker-supplied value falls back to a generic one, so nothing from
+// the query string is ever reflected verbatim.
+const ERROR_MESSAGES: Record<string, string> = {
+  missing: 'Please enter both your email and password.',
+  credentials: 'Incorrect email or password.',
+  notadmin: 'That account is not authorised for admin access.',
+  '1': 'Incorrect email or password.',
+};
+const errorCode = Astro.url.searchParams.get('error');
+const errorMsg = errorCode
+  ? ERROR_MESSAGES[errorCode] ?? 'Sign-in failed. Please try again.'
+  : null;
 ---
 
 <BaseLayout title="Sign in" themeToggle>

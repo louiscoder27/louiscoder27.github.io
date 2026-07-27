@@ -19,7 +19,27 @@ export const POST: APIRoute = async (context) => {
     return new Response(JSON.stringify({ error: 'No file' }), { status: 400 });
   }
 
-  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+  // Defence-in-depth (route is admin-only, but the bucket is public): allow only
+  // raster images — no SVG (can carry script) — and cap the size.
+  const ALLOWED = new Set([
+    'image/png',
+    'image/jpeg',
+    'image/gif',
+    'image/webp',
+    'image/avif',
+  ]);
+  const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+  if (!ALLOWED.has(file.type)) {
+    return new Response(JSON.stringify({ error: 'Only PNG/JPEG/GIF/WebP/AVIF images are allowed' }), { status: 415 });
+  }
+  if (file.size > MAX_BYTES) {
+    return new Response(JSON.stringify({ error: 'Image is too large (max 10 MB)' }), { status: 413 });
+  }
+
+  // Build the key from a random UUID + a sanitised extension so nothing from the
+  // client filename can shape the storage path.
+  const ext =
+    (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8) || 'bin';
   const path = `${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage
     .from('post-assets')
