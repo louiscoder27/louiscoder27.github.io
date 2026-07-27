@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-family: var(--font-display);
+  font-family: var(--font-post);
   font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -25,7 +25,7 @@
 .ed__field input,
 .ed__field select {
   padding: 0.6rem 0.75rem;
-  font-family: var(--font-body);
+  font-family: var(--font-post);
   font-size: var(--text-base);
   font-weight: 400;
   letter-spacing: normal;
@@ -64,7 +64,7 @@
     border-color var(--dur-med) var(--ease-out);
 
   /* BlockNote (mantine) theming — inherited into .bn-container */
-  --bn-font-family: var(--font-body);
+  --bn-font-family: var(--font-post);
   --bn-colors-editor-text: #524378; /* Mocha — matches reader prose (light) */
   --bn-colors-editor-background: transparent;
   --bn-colors-menu-text: var(--color-ink);
@@ -91,7 +91,7 @@ html[data-theme='dark'] .ed__editor {
 }
 /* Headings inside the editor use the display face + reader heading colour. */
 .ed__editor [data-content-type='heading'] {
-  font-family: var(--font-display);
+  font-family: var(--font-post);
   color: #a7a955; /* Olive — reader headings (light) */
   letter-spacing: -0.015em;
 }
@@ -114,7 +114,7 @@ html[data-theme='dark'] .ed__editor [data-content-type='heading'] {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-family: var(--font-display);
+  font-family: var(--font-post);
   font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
@@ -137,7 +137,7 @@ html[data-theme='dark'] .ed__editor [data-content-type='heading'] {
 }
 .ed__btn {
   padding: 0.6rem 1.1rem;
-  font-family: var(--font-display);
+  font-family: var(--font-post);
   font-weight: 600;
   font-size: var(--text-xs);
   letter-spacing: 0.03em;
