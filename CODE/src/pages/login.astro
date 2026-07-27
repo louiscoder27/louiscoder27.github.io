@@ -2,7 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 
-const error = Astro.url.searchParams.get('error') === '1';
+const errorParam = Astro.url.searchParams.get('error');
+// Legacy generic flag ("1") vs. a specific reason string passed by the API.
+const errorMsg =
+  errorParam === '1'
+    ? 'Incorrect email or password.'
+    : errorParam || null;
 ---
 
 <BaseLayout title="Sign in" themeToggle>
@@ -11,10 +16,8 @@ const error = Astro.url.searchParams.get('error') === '1';
     <h1 class="login__title">Sign in</h1>
     <p class="login__lead">Enter your admin email and password to sign in.</p>
 
-    {error && (
-      <p class="login__note login__note--err">
-        Incorrect email or password. Make sure you're using your authorised admin address.
-      </p>
+    {errorMsg && (
+      <p class="login__note login__note--err">{errorMsg}</p>
     )}
 
     <form class="login__form" method="POST" action="/api/auth/login">
