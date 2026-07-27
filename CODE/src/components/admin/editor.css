@@ -88,10 +88,22 @@ html[data-theme='dark'] .ed__editor {
   padding-inline: 1.25rem;
   font-size: var(--text-md);
   line-height: 1.72;
-}
-/* Headings inside the editor use the display face + reader heading colour. */
-.ed__editor [data-content-type='heading'] {
+  /* BlockNote hardcodes font-family:Inter on .bn-editor.bn-default-styles, so
+     set it directly here — body text inherits it (headings are forced below). */
   font-family: var(--font-post);
+}
+/* BlockNote re-declares --bn-font-family ("Inter") on .bn-container itself, which
+   beats a value inherited from .ed__editor. Override it on the container so BOTH
+   body text and headings (which inherit it) use JetBrains Mono. */
+.ed__editor .bn-container {
+  --bn-font-family: var(--font-post);
+}
+/* Headings: force the mono face (win over BlockNote's own rules) + reader colour. */
+.ed__editor [data-content-type='heading'],
+.ed__editor [data-content-type='heading'] .bn-inline-content {
+  font-family: var(--font-post) !important;
+}
+.ed__editor [data-content-type='heading'] {
   color: #a7a955; /* Olive — reader headings (light) */
   letter-spacing: -0.015em;
 }
