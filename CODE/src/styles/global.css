@@ -235,11 +235,14 @@ body.post-page {
   --color-paper: #ebe9dd; /* Coconut — page background */
 }
 /* Article body → JetBrains Mono. .prose text inherits it from .post (set in
-   PostLayout); the subheadings pin the display face via the h2/h3/h4 rule above,
-   so re-point them here. Body text/strong/em all follow the inherited face. */
+   PostLayout); headings pin the display face via the global h1–h4 rule, so
+   re-point every level here (BlockNote content can emit <h1>). */
+body.post-page .prose h1,
 body.post-page .prose h2,
 body.post-page .prose h3,
-body.post-page .prose h4 {
+body.post-page .prose h4,
+body.post-page .prose h5,
+body.post-page .prose h6 {
   font-family: var(--font-post);
 }
 /* Wider reading frame, centred on the page (was --measure, left-aligned). */
@@ -251,9 +254,12 @@ body.post-page .prose {
   color: #524378; /* Mocha — post content */
 }
 body.post-page .post__title,
+body.post-page .prose h1,
 body.post-page .prose h2,
 body.post-page .prose h3,
-body.post-page .prose h4 {
+body.post-page .prose h4,
+body.post-page .prose h5,
+body.post-page .prose h6 {
   color: #a7a955; /* Olive — post headings */
 }
 
@@ -265,9 +271,12 @@ html[data-theme='dark'] body.post-page .prose {
 }
 /* "Các tiêu đề khác giữ nguyên" — headings keep their default dark-mode ink. */
 html[data-theme='dark'] body.post-page .post__title,
+html[data-theme='dark'] body.post-page .prose h1,
 html[data-theme='dark'] body.post-page .prose h2,
 html[data-theme='dark'] body.post-page .prose h3,
-html[data-theme='dark'] body.post-page .prose h4 {
+html[data-theme='dark'] body.post-page .prose h4,
+html[data-theme='dark'] body.post-page .prose h5,
+html[data-theme='dark'] body.post-page .prose h6 {
   color: var(--color-ink);
 }
 
