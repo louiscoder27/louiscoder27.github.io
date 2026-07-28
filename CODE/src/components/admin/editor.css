@@ -111,6 +111,19 @@ html[data-theme='dark'] .ed__editor [data-content-type='heading'] {
   color: var(--color-ink); /* headings keep default light ink in dark */
 }
 
+/* Text-colour picks: override BlockNote's muted stock palette with the same
+   vivid, theme-aware tokens the reader uses, so what you colour is what gets
+   published. (Higher specificity than BlockNote's own [data-text-color] rules.) */
+.ed__editor [data-text-color='gray'] { color: var(--tc-gray); }
+.ed__editor [data-text-color='brown'] { color: var(--tc-brown); }
+.ed__editor [data-text-color='red'] { color: var(--tc-red); }
+.ed__editor [data-text-color='orange'] { color: var(--tc-orange); }
+.ed__editor [data-text-color='yellow'] { color: var(--tc-yellow); }
+.ed__editor [data-text-color='green'] { color: var(--tc-green); }
+.ed__editor [data-text-color='blue'] { color: var(--tc-blue); }
+.ed__editor [data-text-color='purple'] { color: var(--tc-purple); }
+.ed__editor [data-text-color='pink'] { color: var(--tc-pink); }
+
 .ed__bar {
   position: sticky;
   bottom: 0;

@@ -113,6 +113,25 @@
   --color-footer-muted: color-mix(in oklch, var(--color-light-gold) 78%, transparent); /* dimmed body text on dark */
   --color-footer-rule: color-mix(in oklch, var(--color-light-gold) 35%, transparent); /* hairline separators on dark */
   --color-footer-link: var(--color-light-gold); /* warm-gold link, readable on dark */
+
+  /* ---- Editor content colours (text colour / list-marker picks) --------------
+   * These are USER-chosen inline colours from the BlockNote editor, so — unlike
+   * everything above — they live outside the 5-swatch brand palette by design.
+   * BlockNote's stock palette is a muted Notion set that sinks into the warm
+   * Coconut paper; these are re-tuned vivid/high-contrast so a colour picked in
+   * the editor stays legible once published. Light values are saturated but dark
+   * enough to read on Coconut; the dark-theme block below flips them to neon so
+   * they pop on the Ink-Void ground. Both the reader (.prose) and the editor
+   * (.ed__editor) map data-text-color onto these. */
+  --tc-gray: #5c5b57;
+  --tc-brown: #9a4a25;
+  --tc-red: #ef0d33;
+  --tc-orange: #ec5800;
+  --tc-yellow: #b8860b;
+  --tc-green: #08924a;
+  --tc-blue: #0a5bd8;
+  --tc-purple: #7c1fff;
+  --tc-pink: #e01578;
 }
 
 /* ---- Dark theme (post pages only) ---------------------------------------
@@ -153,4 +172,15 @@
   /* ---- Footer stays self-consistently dark (don't follow ink→snow) ---- */
   --color-footer-bg: color-mix(in oklch, var(--color-slate) 18%, var(--color-charcoal));
   --color-footer-ink: var(--color-snow);
+
+  /* ---- Editor content colours → neon on the dark ground (see :root) ---- */
+  --tc-gray: #bdbcb4;
+  --tc-brown: #e0a074;
+  --tc-red: #ff5468;
+  --tc-orange: #ff9640;
+  --tc-yellow: #ffd24d;
+  --tc-green: #37e58a;
+  --tc-blue: #5cb0ff;
+  --tc-purple: #c58bff;
+  --tc-pink: #ff69c0;
 }

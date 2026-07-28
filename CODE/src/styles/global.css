@@ -226,29 +226,29 @@ html[data-theme='dark'] .prose pre.shiki span {
  * styles — to paint them. Re-declare BlockNote's default palette here so colours
  * chosen in the editor also show on the public post. Values match
  * @blocknote/core's style.css exactly. */
-.prose [data-text-color='gray'] { color: #9b9a97; }
-.prose [data-text-color='brown'] { color: #64473a; }
-.prose [data-text-color='red'] { color: #e03e3e; }
-.prose [data-text-color='orange'] { color: #d9730d; }
-.prose [data-text-color='yellow'] { color: #dfab01; }
-.prose [data-text-color='green'] { color: #4d6461; }
-.prose [data-text-color='blue'] { color: #0b6e99; }
-.prose [data-text-color='purple'] { color: #6940a5; }
-.prose [data-text-color='pink'] { color: #ad1a72; }
+.prose [data-text-color='gray'] { color: var(--tc-gray); }
+.prose [data-text-color='brown'] { color: var(--tc-brown); }
+.prose [data-text-color='red'] { color: var(--tc-red); }
+.prose [data-text-color='orange'] { color: var(--tc-orange); }
+.prose [data-text-color='yellow'] { color: var(--tc-yellow); }
+.prose [data-text-color='green'] { color: var(--tc-green); }
+.prose [data-text-color='blue'] { color: var(--tc-blue); }
+.prose [data-text-color='purple'] { color: var(--tc-purple); }
+.prose [data-text-color='pink'] { color: var(--tc-pink); }
 
 /* When an entire list item is coloured, BlockNote puts the colour on the item's
  * <p> — the list marker ("1." / bullet) is drawn by the <li> and would stay the
  * default colour. Match the marker to the item, but only when the whole item is
  * coloured (colour on the direct <p>), not when just a <span> inside it is. */
-.prose li:has(> p[data-text-color='gray'])::marker { color: #9b9a97; }
-.prose li:has(> p[data-text-color='brown'])::marker { color: #64473a; }
-.prose li:has(> p[data-text-color='red'])::marker { color: #e03e3e; }
-.prose li:has(> p[data-text-color='orange'])::marker { color: #d9730d; }
-.prose li:has(> p[data-text-color='yellow'])::marker { color: #dfab01; }
-.prose li:has(> p[data-text-color='green'])::marker { color: #4d6461; }
-.prose li:has(> p[data-text-color='blue'])::marker { color: #0b6e99; }
-.prose li:has(> p[data-text-color='purple'])::marker { color: #6940a5; }
-.prose li:has(> p[data-text-color='pink'])::marker { color: #ad1a72; }
+.prose li:has(> p[data-text-color='gray'])::marker { color: var(--tc-gray); }
+.prose li:has(> p[data-text-color='brown'])::marker { color: var(--tc-brown); }
+.prose li:has(> p[data-text-color='red'])::marker { color: var(--tc-red); }
+.prose li:has(> p[data-text-color='orange'])::marker { color: var(--tc-orange); }
+.prose li:has(> p[data-text-color='yellow'])::marker { color: var(--tc-yellow); }
+.prose li:has(> p[data-text-color='green'])::marker { color: var(--tc-green); }
+.prose li:has(> p[data-text-color='blue'])::marker { color: var(--tc-blue); }
+.prose li:has(> p[data-text-color='purple'])::marker { color: var(--tc-purple); }
+.prose li:has(> p[data-text-color='pink'])::marker { color: var(--tc-pink); }
 
 .prose [data-background-color] {
   padding: 0 0.15em;
