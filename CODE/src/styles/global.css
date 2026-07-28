@@ -250,23 +250,23 @@ html[data-theme='dark'] .prose pre.shiki span {
 .prose li:has(> p[data-text-color='purple'])::marker { color: var(--tc-purple); }
 .prose li:has(> p[data-text-color='pink'])::marker { color: var(--tc-pink); }
 
+/* Bright "highlighter pen" washes. The washes are light, so pin dark ink on any
+ * highlighted run (both themes) to keep it legible — an inner data-text-color
+ * span still overrides this. */
 .prose [data-background-color] {
   padding: 0 0.15em;
   border-radius: 3px;
+  color: var(--bg-ink);
 }
-.prose [data-background-color='gray'] { background-color: #ebeced; }
-.prose [data-background-color='brown'] { background-color: #e9e5e3; }
-.prose [data-background-color='red'] { background-color: #fbe4e4; }
-.prose [data-background-color='orange'] { background-color: #f6e9d9; }
-.prose [data-background-color='yellow'] { background-color: #fbf3db; }
-.prose [data-background-color='green'] { background-color: #ddedea; }
-.prose [data-background-color='blue'] { background-color: #ddebf1; }
-.prose [data-background-color='purple'] { background-color: #eae4f2; }
-.prose [data-background-color='pink'] { background-color: #f4dfeb; }
-/* The highlight tints are light; in dark mode the post's cream body text would
- * vanish on them, so pin readable dark ink on any highlighted run (an inner
- * data-text-color span still overrides this). */
-html[data-theme='dark'] .prose [data-background-color] { color: #23212c; }
+.prose [data-background-color='gray'] { background-color: var(--bg-gray); }
+.prose [data-background-color='brown'] { background-color: var(--bg-brown); }
+.prose [data-background-color='red'] { background-color: var(--bg-red); }
+.prose [data-background-color='orange'] { background-color: var(--bg-orange); }
+.prose [data-background-color='yellow'] { background-color: var(--bg-yellow); }
+.prose [data-background-color='green'] { background-color: var(--bg-green); }
+.prose [data-background-color='blue'] { background-color: var(--bg-blue); }
+.prose [data-background-color='purple'] { background-color: var(--bg-purple); }
+.prose [data-background-color='pink'] { background-color: var(--bg-pink); }
 
 .prose [data-text-alignment='center'] { text-align: center; }
 .prose [data-text-alignment='right'] { text-align: right; }

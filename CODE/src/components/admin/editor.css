@@ -124,6 +124,19 @@ html[data-theme='dark'] .ed__editor [data-content-type='heading'] {
 .ed__editor [data-text-color='purple'] { color: var(--tc-purple); }
 .ed__editor [data-text-color='pink'] { color: var(--tc-pink); }
 
+/* Highlight ("marker pen") picks: same bright washes as the reader, with dark
+   ink pinned on top so the run stays legible (matches published output). */
+.ed__editor [data-background-color] { color: var(--bg-ink); }
+.ed__editor [data-background-color='gray'] { background-color: var(--bg-gray); }
+.ed__editor [data-background-color='brown'] { background-color: var(--bg-brown); }
+.ed__editor [data-background-color='red'] { background-color: var(--bg-red); }
+.ed__editor [data-background-color='orange'] { background-color: var(--bg-orange); }
+.ed__editor [data-background-color='yellow'] { background-color: var(--bg-yellow); }
+.ed__editor [data-background-color='green'] { background-color: var(--bg-green); }
+.ed__editor [data-background-color='blue'] { background-color: var(--bg-blue); }
+.ed__editor [data-background-color='purple'] { background-color: var(--bg-purple); }
+.ed__editor [data-background-color='pink'] { background-color: var(--bg-pink); }
+
 .ed__bar {
   position: sticky;
   bottom: 0;

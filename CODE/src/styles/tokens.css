@@ -132,6 +132,20 @@
   --tc-blue: #0a5bd8;
   --tc-purple: #7c1fff;
   --tc-pink: #e01578;
+
+  /* Highlight / "marker pen" background picks. Bright neon washes (same in both
+   * themes — a highlighter reads the same on any ground); --bg-ink is the dark
+   * text colour pinned on top so a run stays legible on every wash. */
+  --bg-ink: #211c2e;
+  --bg-gray: #cfcfcf;
+  --bg-brown: #f2b878;
+  --bg-red: #ff6b78;
+  --bg-orange: #ffab52;
+  --bg-yellow: #ffe94d;
+  --bg-green: #6cf08a;
+  --bg-blue: #74d0ff;
+  --bg-purple: #cfa0ff;
+  --bg-pink: #ff8ed6;
 }
 
 /* ---- Dark theme (post pages only) ---------------------------------------
