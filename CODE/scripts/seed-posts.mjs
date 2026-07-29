@@ -66,7 +66,7 @@ for (const file of files) {
     slug,
     title: data.title ?? slug,
     description: data.description ?? '',
-    category: data.category ?? 'Writeups',
+    category: data.category ?? 'Vault',
     body_json: null,
     body_html: html,
     published: data.draft ? false : true,

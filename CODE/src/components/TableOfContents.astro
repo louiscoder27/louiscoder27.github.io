@@ -1,0 +1,366 @@
+---
+// Floating table-of-contents for the reading page. A small pill in the corner
+// (list icon + "TOC") opens a panel listing every heading in the article;
+// clicking an entry smooth-scrolls to it, and each entry has a copy button that
+// copies a deep link to that section (…/blog/slug#heading-id) so the heading can
+// be referenced/tagged from another post. The list is built server-side from the
+// post's headings (see src/lib/toc.ts).
+import type { TocEntry } from '../lib/toc';
+
+interface Props {
+  toc: TocEntry[];
+}
+const { toc } = Astro.props;
+
+// Indent each entry relative to the shallowest heading present, so a post that
+// starts at h2 still reads flush-left.
+const minLevel = toc.reduce((m, e) => Math.min(m, e.level), 6);
+---
+
+{
+  toc.length > 0 && (
+    <div class="toc" data-toc>
+      <button
+        class="toc__btn"
+        type="button"
+        aria-expanded="false"
+        aria-controls="toc-panel"
+        data-toc-btn
+      >
+        <svg
+          class="toc__btn-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 6h11M9 12h11M9 18h11" />
+          <path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" />
+        </svg>
+        <span class="toc__btn-label">TOC</span>
+      </button>
+
+      <nav class="toc__panel" id="toc-panel" aria-label="Table of contents" hidden>
+        <p class="toc__title">Contents</p>
+        <ul class="toc__list">
+          {toc.map((e) => (
+            <li class="toc__item" style={`--depth:${e.level - minLevel}`}>
+              <a class="toc__link" href={`#${e.id}`} data-toc-link>
+                {e.text}
+              </a>
+              <button
+                class="toc__copy"
+                type="button"
+                data-toc-copy={e.id}
+                title="Copy link to this section"
+                aria-label={`Copy link to “${e.text}”`}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1" />
+                  <path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1" />
+                </svg>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  )
+}
+
+<style>
+  .toc {
+    position: fixed;
+    left: var(--space-md);
+    bottom: var(--space-md);
+    z-index: var(--z-overlay);
+    font-family: var(--font-post);
+  }
+
+  /* ---- Trigger pill ---- */
+  .toc__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: 0.5rem 0.8rem;
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 20px color-mix(in oklch, var(--shadow-color) 22%, transparent);
+    cursor: pointer;
+    transition:
+      transform var(--dur-short) var(--ease-out),
+      background var(--dur-short) var(--ease-out),
+      border-color var(--dur-short) var(--ease-out);
+  }
+  .toc__btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--color-accent);
+  }
+  .toc__btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  .toc__btn-icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: none;
+  }
+  .toc__btn-label {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  /* ---- Panel ---- */
+  .toc__panel {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + var(--space-2xs));
+    width: min(20rem, calc(100vw - 2 * var(--space-md)));
+    max-height: min(60vh, 30rem);
+    overflow-y: auto;
+    padding: var(--space-sm);
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 34px color-mix(in oklch, var(--shadow-color) 28%, transparent);
+    /* Enter/exit animation */
+    transform-origin: bottom left;
+    animation: toc-in var(--dur-short) var(--ease-out);
+  }
+  .toc__panel[hidden] {
+    display: none;
+  }
+  @keyframes toc-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+  }
+
+  .toc__title {
+    margin-bottom: var(--space-2xs);
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .toc__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .toc__item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding-left: calc(var(--depth, 0) * 0.85rem);
+  }
+  .toc__link {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: block;
+    padding: 0.3rem 0.35rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    line-height: 1.35;
+    color: var(--color-ink-2);
+    text-decoration: none;
+    transition:
+      color var(--dur-short) var(--ease-out),
+      background var(--dur-short) var(--ease-out);
+  }
+  .toc__link:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-tint);
+  }
+  .toc__item.is-current > .toc__link {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .toc__copy {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    background: transparent;
+    color: var(--color-muted);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    opacity: 0.55;
+    transition:
+      opacity var(--dur-short) var(--ease-out),
+      color var(--dur-short) var(--ease-out),
+      background var(--dur-short) var(--ease-out);
+  }
+  .toc__item:hover .toc__copy {
+    opacity: 1;
+  }
+  .toc__copy:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-tint);
+  }
+  .toc__copy:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 1px;
+    opacity: 1;
+  }
+  .toc__copy svg {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+  .toc__copy.is-copied {
+    color: var(--color-accent);
+    opacity: 1;
+  }
+  .toc__copy.is-copied svg {
+    display: none;
+  }
+  .toc__copy.is-copied::after {
+    content: '✓';
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .toc__btn-label {
+      /* keep the pill compact on small screens but still show TOC */
+      font-size: 0.55rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toc__panel {
+      animation: none;
+    }
+    .toc__btn {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Wire up every TOC island on the page (there is only one, but scope defensively).
+  document.querySelectorAll<HTMLElement>('[data-toc]').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-toc-btn]');
+    const panel = root.querySelector<HTMLElement>('#toc-panel');
+    if (!btn || !panel) return;
+
+    const open = () => {
+      panel.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+    };
+    const close = () => {
+      panel.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    };
+    const toggle = () => (panel.hidden ? open() : close());
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+
+    // Clicking a heading link closes the panel (the browser handles the jump).
+    panel.querySelectorAll<HTMLAnchorElement>('[data-toc-link]').forEach((link) => {
+      link.addEventListener('click', () => close());
+    });
+
+    // Copy a deep link to the section. Uses the Clipboard API with a legacy
+    // fallback so it works over http/localhost too.
+    panel.querySelectorAll<HTMLButtonElement>('[data-toc-copy]').forEach((copyBtn) => {
+      copyBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = copyBtn.getAttribute('data-toc-copy');
+        if (!id) return;
+        const url = `${location.origin}${location.pathname}#${id}`;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(url);
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          copyBtn.classList.add('is-copied');
+          setTimeout(() => copyBtn.classList.remove('is-copied'), 1200);
+        } catch {
+          /* clipboard blocked — silently ignore */
+        }
+      });
+    });
+
+    // Close on outside click / Escape.
+    document.addEventListener('click', (e) => {
+      if (!panel.hidden && !root.contains(e.target as Node)) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) {
+        close();
+        btn.focus();
+      }
+    });
+
+    // Scroll-spy: highlight the entry for the heading nearest the top.
+    const links = Array.from(
+      panel.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'),
+    );
+    const byId = new Map<string, HTMLElement>();
+    links.forEach((link) => {
+      const id = decodeURIComponent(link.hash.slice(1));
+      const heading = id ? document.getElementById(id) : null;
+      if (heading) byId.set(id, link.closest('.toc__item') as HTMLElement);
+    });
+
+    if (byId.size && 'IntersectionObserver' in window) {
+      const visible = new Set<string>();
+      const setCurrent = (id: string | null) => {
+        byId.forEach((item, key) => item.classList.toggle('is-current', key === id));
+      };
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const id = entry.target.id;
+            if (entry.isIntersecting) visible.add(id);
+            else visible.delete(id);
+          }
+          // Pick the first heading (document order) currently on screen.
+          const first = links
+            .map((l) => decodeURIComponent(l.hash.slice(1)))
+            .find((id) => visible.has(id));
+          if (first) setCurrent(first);
+        },
+        { rootMargin: '0px 0px -70% 0px', threshold: 0 },
+      );
+      byId.forEach((_item, id) => {
+        const h = document.getElementById(id);
+        if (h) io.observe(h);
+      });
+    }
+  });
+</script>

@@ -15,8 +15,8 @@ create table if not exists public.posts (
   slug          text not null unique,
   title         text not null,
   description   text not null default '',
-  category      text not null default 'Writeups'
-                  check (category in ('Writeups', 'Courses', 'Projects')),
+  category      text not null default 'Vault'
+                  check (category in ('Vault', 'Courses', 'Projects')),
   body_json     jsonb,                       -- BlockNote document (source for editing)
   body_html     text not null default '',    -- rendered HTML (shown on public pages)
   published     boolean not null default false,

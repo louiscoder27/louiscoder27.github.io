@@ -2,7 +2,7 @@
 title: How to Read a Company From Its Cash Flow Statement
 description: Earnings are an opinion; cash is a fact. A working guide to reading the statement that is hardest to fake.
 pubDate: 2024-03-12
-category: Writeups
+category: Vault
 ---
 
 Most people start with the income statement. I've learned to start at the back, with the cash flow statement, because it answers the one question the other two only imply: **did money actually come in?**

@@ -164,6 +164,10 @@ hr {
 .prose > * + * {
   margin-top: var(--space-md);
 }
+/* Offset heading jumps (TOC / deep links) so the target lands clear of the top. */
+.prose :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: var(--space-lg);
+}
 .prose h2 {
   font-size: var(--text-xl);
   margin-top: var(--space-xl);

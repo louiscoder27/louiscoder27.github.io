@@ -2,6 +2,7 @@
 import PostLayout from '../../layouts/PostLayout.astro';
 import { getPostBySlug } from '../../lib/posts';
 import { highlightCodeBlocks } from '../../lib/highlight';
+import { buildToc } from '../../lib/toc';
 
 const { slug } = Astro.params;
 const post = slug ? await getPostBySlug(slug) : null;
@@ -11,7 +12,9 @@ if (!post) {
 }
 
 // The editor stores code blocks as plain text; colour their tokens here.
-const bodyHtml = await highlightCodeBlocks(post.body_html);
+const highlighted = await highlightCodeBlocks(post.body_html);
+// Give every heading a stable anchor id and derive the table of contents.
+const { html: bodyHtml, toc } = buildToc(highlighted);
 
 // Cache the rendered page at the edge; revalidate in the background so a freshly
 // published/edited post shows up quickly without hammering the database.
@@ -27,6 +30,7 @@ Astro.response.headers.set(
   pubDate={post.data.pubDate}
   updatedDate={post.data.updatedDate}
   category={post.data.category}
+  toc={toc}
 >
   <Fragment set:html={bodyHtml} />
 </PostLayout>

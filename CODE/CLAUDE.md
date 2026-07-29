@@ -46,9 +46,10 @@ over the page is the **Astro dev toolbar** — it only appears in `dev`, never i
   `createSupabaseServer({headers,cookies})` (session-bound via cookies, used by middleware / admin
   pages / API routes). Env: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`.
 - **Single sources of truth:**
-  - `src/lib/categories.ts` exports `CATEGORIES` — `Writeups | Courses | Projects` — plus slug/blurb
-    meta. Adding a category means editing this list **and** the `check` constraint in
-    `supabase/schema.sql`.
+  - `src/lib/categories.ts` exports `CATEGORIES` — `Vault | Courses | Projects` — plus slug/blurb
+    meta. Adding or renaming a category means editing this list, the `check` constraint in
+    `supabase/schema.sql`, **and** migrating the stored `category` values in the live DB (the
+    `check` blocks any value not in the list, so both must move together).
   - `src/site.config.ts` — title, author, tagline, contact links. Edit here, not in components.
 - **Data helpers** — `src/lib/posts.ts`: `getPosts()` (published, newest first, fails soft to `[]`),
   `getPostBySlug()`, `countByCategory()`, `yearsActive()`. They return the historical
@@ -65,13 +66,15 @@ over the page is the **Astro dev toolbar** — it only appears in `dev`, never i
   `/api/upload`.
 - **Routing** — `src/pages/`: `index.astro` (home — renders `IntroStage`) and
   `blog/[...slug].astro` (post — SSR: `getPostBySlug()`, 404 if missing/unpublished, body rendered
-  with `set:html` of `body_html`). Public pages send a short `s-maxage`/`stale-while-revalidate`
+  with `set:html` of `body_html`; before render it runs `highlightCodeBlocks()` then `buildToc()`
+  from `src/lib/toc.ts`, which injects a stable anchor id on every heading and returns the table of
+  contents passed to `PostLayout`). Public pages send a short `s-maxage`/`stale-while-revalidate`
   Cache-Control so edits appear fast without hammering the DB. There are **no** separate archive or
-  category pages: each category (`Writeups | Courses |
+  category pages: each category (`Vault | Courses |
   Projects`) is a **tab inside the home page's "work box"** (IntroStage's third slide). The nav rail
-  + bottom nav are hash links (`#writeups` …); a small script in `IntroStage` swaps which
+  + bottom nav are hash links (`#vault` …); a small script in `IntroStage` swaps which
   `.work__view` is shown in the box (Home = "Latest posts"), so switching sections never loads a new
-  page and never leaves the home screen. A deep-link like `/#writeups` (used by the post-page
+  page and never leaves the home screen. A deep-link like `/#vault` (used by the post-page
   "back"/category links) opens on load and auto-scrolls the sticky stage to reveal the box. Reading
   an individual essay still opens its own `/blog/[slug]` page. There is no separate About page either
   — the about content lives inside `IntroStage`, anchored at `#about`. A post's slug is the `slug`
@@ -85,8 +88,11 @@ over the page is the **Astro dev toolbar** — it only appears in `dev`, never i
   `Footer` (Ft2), `PostCard` (category/archive list rows, used on post pages),
   `CategoryCards` (typographic section cards, currently unused by any page but kept for reuse),
   `ThemeToggle` (the fixed top-right dark/light switch — used by **both** `PostLayout` and every
-  `/admin` page + `/login`, so reader and editor flip together). The admin editor island lives at
-  `src/components/admin/Editor.tsx` (+ `editor.css`).
+  `/admin` page + `/login`, so reader and editor flip together),
+  `TableOfContents` (a fixed bottom-left "TOC" pill on post pages: opens a panel listing the article's
+  headings — data comes from `buildToc()` — that smooth-scrolls to a section, scroll-spies the current
+  one, and per entry copies a deep link `…/blog/slug#heading-id` so a section can be referenced from
+  another post). The admin editor island lives at `src/components/admin/Editor.tsx` (+ `editor.css`).
 - **Base-path discipline** — this repo may move between a user page (`base: '/'`) and a project
   repo. Every internal link is built through a `withBase()` helper using `import.meta.env.BASE_URL`,
   so links keep working if `base` changes in `astro.config.mjs`. Follow that pattern for new links.

@@ -2,7 +2,7 @@
 title: Moats, and How to Tell a Real One From a Story
 description: Every pitch deck claims a moat. Most describe a head start. Here's how I separate durable advantage from a good year.
 pubDate: 2026-02-16
-category: Writeups
+category: Vault
 ---
 
 "Moat" might be the most overused word in investing. Companies claim one the way restaurants claim to be authentic. A real economic moat is specific and testable: it's a **structural reason a competitor can't simply copy the business and compete the profit away.**
