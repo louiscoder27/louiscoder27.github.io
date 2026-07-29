@@ -1,10 +1,26 @@
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
+import 'katex/dist/katex.min.css';
 import './editor.css';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/mantine';
 import type { PartialBlock } from '@blocknote/core';
+import renderMathInElement from 'katex/contrib/auto-render';
 import { useEffect, useRef, useState } from 'react';
+
+// Render $…$ / $$…$$ LaTeX inside an element — shared delimiter config so the
+// editor preview matches exactly what the reader page produces.
+function typesetMath(el: HTMLElement) {
+  renderMathInElement(el, {
+    delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false },
+      { left: '\\[', right: '\\]', display: true },
+      { left: '\\(', right: '\\)', display: false },
+    ],
+    throwOnError: false,
+  });
+}
 
 export interface EditorPost {
   id: string | null; // null => new post
@@ -66,6 +82,12 @@ export default function Editor({ post, categories }: Props) {
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Live math preview: renders the current document (with KaTeX) so the author
+  // can check formulas without leaving the editor.
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
+  const previewRef = useRef<HTMLDivElement>(null);
+
   // Keep the editor's light/dark theme in sync with the page toggle.
   const [dark, setDark] = useState(false);
   useEffect(() => {
@@ -96,6 +118,26 @@ export default function Editor({ post, categories }: Props) {
         .catch(() => {});
     }
   }, [editor, post.body_json, post.body_html]);
+
+  // Recompute the preview HTML from the current document (same lossy HTML the
+  // reader gets), so what you see previewed is what gets published.
+  async function refreshPreview() {
+    try {
+      setPreviewHtml(await editor.blocksToHTMLLossy(editor.document));
+    } catch {
+      setPreviewHtml('');
+    }
+  }
+
+  // When the preview is open, keep it in sync with edits + typeset the math.
+  useEffect(() => {
+    if (showPreview) refreshPreview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPreview]);
+
+  useEffect(() => {
+    if (showPreview && previewRef.current) typesetMath(previewRef.current);
+  }, [previewHtml, showPreview]);
 
   // Auto-fill the slug from the title until the user edits it by hand.
   function onTitle(v: string) {
@@ -197,9 +239,32 @@ export default function Editor({ post, categories }: Props) {
         </label>
       </div>
 
+      <p className="ed__hint">
+        Toán học: gõ LaTeX giữa <code>$…$</code> cho công thức trong dòng (vd{' '}
+        <code>$\hat{'{'}y{'}'} = \beta_0 + \beta_1 x$</code>) hoặc{' '}
+        <code>$$…$$</code> cho công thức riêng dòng. Bật “Xem trước” để kiểm tra.
+      </p>
+
       <div className="ed__editor">
-        <BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} />
+        <BlockNoteView
+          editor={editor}
+          theme={dark ? 'dark' : 'light'}
+          onChange={() => {
+            if (showPreview) refreshPreview();
+          }}
+        />
       </div>
+
+      {showPreview && (
+        <div className="ed__preview">
+          <div className="ed__preview-label">Xem trước</div>
+          <div
+            ref={previewRef}
+            className="prose"
+            dangerouslySetInnerHTML={{ __html: previewHtml }}
+          />
+        </div>
+      )}
 
       <div className="ed__bar">
         <label className="ed__pub">
@@ -212,6 +277,13 @@ export default function Editor({ post, categories }: Props) {
         </label>
         <span className="ed__status">{status}</span>
         <div className="ed__actions">
+          <button
+            className={`ed__btn${showPreview ? ' ed__btn--primary' : ''}`}
+            type="button"
+            onClick={() => setShowPreview((v) => !v)}
+          >
+            {showPreview ? 'Ẩn xem trước' : 'Xem trước'}
+          </button>
           <button
             className="ed__btn"
             type="button"

@@ -137,6 +137,39 @@ html[data-theme='dark'] .ed__editor [data-content-type='heading'] {
 .ed__editor [data-background-color='purple'] { background-color: var(--bg-purple); }
 .ed__editor [data-background-color='pink'] { background-color: var(--bg-pink); }
 
+/* Math help line above the writing surface. */
+.ed__hint {
+  font-family: var(--font-post);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-muted);
+  margin: -0.25rem 0 0;
+}
+.ed__hint code {
+  font-family: var(--font-post);
+  padding: 0.05rem 0.3rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-3);
+  color: var(--color-ink-2);
+}
+
+/* Live math preview — mirrors the reader article (.prose) with rendered KaTeX. */
+.ed__preview {
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  padding: 1rem 1.25rem 1.25rem;
+}
+.ed__preview-label {
+  font-family: var(--font-post);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 0.75rem;
+}
+
 .ed__bar {
   position: sticky;
   bottom: 0;
