@@ -432,22 +432,18 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   .about__name {
     margin: 0;
     font-family: var(--font-body);
-    font-style: italic;
     font-weight: 700;
     font-size: clamp(1.85rem, 4.4vw, 3rem);
     line-height: 1.03;
     letter-spacing: 0.01em;
-    text-transform: uppercase;
     color: var(--color-ink);
   }
   .about__affil {
     margin: var(--space-2xs) 0 0;
     font-family: var(--font-body);
-    font-style: italic;
     font-weight: 400;
     font-size: clamp(1rem, 2.2vw, 1.375rem);
     letter-spacing: 0.12em;
-    text-transform: uppercase;
     color: var(--color-ink-2);
   }
   .about__links {
@@ -458,11 +454,9 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   }
   .about__pill {
     font-family: var(--font-body);
-    font-style: italic;
     font-size: var(--text-sm);
     font-weight: 600;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--color-ink);
     padding: 0.6rem 1.15rem;
     border-radius: 999px;
@@ -483,7 +477,6 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     flex-wrap: wrap;
     gap: clamp(1rem, 4vw, 2.5rem);
     font-family: var(--font-body);
-    font-style: italic;
   }
   .about__stat {
     display: flex;
@@ -504,9 +497,9 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   .about__lbl {
     margin-top: var(--space-3xs);
     font-size: var(--text-sm);
+    font-weight: 700;
     letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-ink-2);
+    color: var(--color-ink);
   }
 
   /* ---- Right: bio card + fields of study ---- */
@@ -517,16 +510,17 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   }
   .about__bio {
     padding: clamp(1.5rem, 3.5vw, 2.25rem);
+    display: grid;
+    place-items: center;
+    text-align: center;
   }
   .about__bio p {
     margin: 0;
     font-family: var(--font-body);
-    font-style: italic;
     font-weight: 700;
     font-size: clamp(0.95rem, 1.7vw, 1.25rem);
     line-height: 1.4;
     letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: var(--color-ink);
   }
   .about__fields {
@@ -545,11 +539,9 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     min-height: 3.25rem;
     padding: 0.75rem 1rem;
     font-family: var(--font-body);
-    font-style: italic;
     font-size: var(--text-md);
     font-weight: 600;
     letter-spacing: 0.12em;
-    text-transform: uppercase;
     color: var(--color-ink);
     /* Lighter than the big cards. */
     box-shadow: 0 10px 24px color-mix(in oklch, var(--shadow-color) 22%, transparent);
@@ -848,6 +840,22 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     .work__body { padding-left: 0; }
   }
 
+  /* Very small phones: strip each post card down to section → title → date.
+     Drop the description and stack the three remaining pieces in that order
+     (the section chip is a sibling of the title/date block, so re-order with
+     flex `order` instead of moving markup). */
+  @media (max-width: 480px) {
+    .wpost {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+    .wpost__cat { order: -1; }   /* section first */
+    .wpost__main { order: 0; }   /* then title + date */
+    .wpost__desc { display: none; }
+    .wpost__date { margin-top: 0.35rem; }
+  }
+
   /* ---- Persistent footer ---- */
   .intro__bar {
     position: absolute;
@@ -916,6 +924,21 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   .intro__link:focus-visible {
     outline: 2px solid var(--hero-ink);
     outline-offset: 3px;
+  }
+
+  /* ---- Mobile footer: keep only the quote ----
+     On phones the bottom nav duplicates the work-box rail, so drop it and let
+     the quote stand alone. */
+  @media (max-width: 640px) {
+    .intro__nav {
+      display: none;
+    }
+  }
+  /* When the quote box would collide with the centred info/work box, a small
+     script measures the overlap and adds this class — drop the whole footer
+     (quote AND nav) so nothing overlaps. */
+  .intro__bar.is-collapsed {
+    display: none;
   }
 
   @keyframes intro-rise {
@@ -1164,5 +1187,36 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     window.addEventListener('hashchange', () => applyHash({ scroll: true, smooth: true }));
     // Honour a deep-linked section on first load (e.g. /#vault from a post).
     applyHash({ scroll: true, smooth: false });
+  }
+
+  // ---- Hide the footer when the quote collides with the content box ----
+  // The About card and the work box are centred in the sticky stage; the quote
+  // + nav bar sits at the bottom. On small / short screens the box grows tall
+  // enough to overlap the bar. Measure the real geometry (not a guessed
+  // breakpoint) and drop the whole bar when the lowest box edge reaches it.
+  const bar = document.querySelector<HTMLElement>('.intro__bar');
+  const boxes = Array.from(
+    document.querySelectorAll<HTMLElement>('.about__grid, .work'),
+  );
+  if (bar && boxes.length) {
+    const GAP = 12; // px of breathing room required between box and bar
+
+    const syncBar = () => {
+      // Remove first so the bar is measurable even if it's currently hidden;
+      // reading offsetTop below forces the reflow so measurements stay valid.
+      bar.classList.remove('is-collapsed');
+      const barTop = bar.offsetTop; // relative to the sticky stage (scroll-independent)
+      let lowestBox = 0;
+      for (const box of boxes) {
+        lowestBox = Math.max(lowestBox, box.offsetTop + box.offsetHeight);
+      }
+      bar.classList.toggle('is-collapsed', lowestBox + GAP > barTop);
+    };
+
+    window.addEventListener('resize', syncBar, { passive: true });
+    window.addEventListener('orientationchange', syncBar, { passive: true });
+    // Re-measure once fonts/images settle so box heights are final.
+    window.addEventListener('load', syncBar);
+    syncBar();
   }
 </script>

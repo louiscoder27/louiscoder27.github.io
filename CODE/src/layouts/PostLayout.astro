@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import TableOfContents from '../components/TableOfContents.astro';
+import PostExport from '../components/PostExport.astro';
 // KaTeX stylesheet — bundled so `$…$` / `$$…$$` math renders on post pages.
 import 'katex/dist/katex.min.css';
 import { categorySlug } from '../lib/categories';
@@ -15,8 +16,10 @@ interface Props {
   updatedDate?: Date;
   category: Category;
   toc?: TocEntry[];
+  slug: string;
+  exportHtml: string;
 }
-const { title, description, pubDate, updatedDate, category, toc = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, category, toc = [], slug, exportHtml } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
 const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
@@ -59,11 +62,12 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
       </div>
 
       <hr class="post__rule post__rule--end" />
-      <p class="post__back">
+      <div class="post__foot">
         <a class="chip" href={sectionHref}>
           <span aria-hidden="true">←</span> Back to {category}
         </a>
-      </p>
+        <PostExport title={title} html={exportHtml} slug={slug} />
+      </div>
     </div>
   </article>
 </BaseLayout>
@@ -104,7 +108,7 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
   .post__crumbs,
   .post__head,
   .post__rule,
-  .post__back {
+  .post__foot {
     max-width: var(--post-measure);
     margin-inline: auto;
   }
@@ -149,10 +153,14 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
   .post__rule--end {
     margin-top: var(--space-2xl);
   }
-  .post__back {
+  .post__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
     margin-bottom: var(--space-lg);
   }
-  .post__back .chip {
+  .post__foot .chip {
     font-family: var(--font-post);
   }
 </style>

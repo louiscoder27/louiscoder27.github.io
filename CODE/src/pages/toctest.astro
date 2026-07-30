@@ -1,0 +1,19 @@
+---
+export const prerender = true;
+import PostLayout from '../layouts/PostLayout.astro';
+import { buildToc } from '../lib/toc';
+
+const sample =
+  '<h1>Cash Flow Basics</h1><p>hello world</p><h2 data-level="2">Section Two</h2><p>more</p><h3>Sub point</h3><p>end</p>';
+const { html, toc } = buildToc(sample);
+---
+
+<PostLayout
+  title="TOC test"
+  description="temp"
+  pubDate={new Date('2025-01-01')}
+  category={'Vault' as any}
+  toc={toc}
+>
+  <Fragment set:html={html} />
+</PostLayout>

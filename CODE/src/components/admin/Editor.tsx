@@ -7,6 +7,7 @@ import { BlockNoteView } from '@blocknote/mantine';
 import type { PartialBlock } from '@blocknote/core';
 import renderMathInElement from 'katex/contrib/auto-render';
 import { useEffect, useRef, useState } from 'react';
+import { fileToHtml } from './importDoc';
 
 // Render $…$ / $$…$$ LaTeX inside an element — shared delimiter config so the
 // editor preview matches exactly what the reader page produces.
@@ -81,6 +82,8 @@ export default function Editor({ post, categories }: Props) {
   const [published, setPublished] = useState(post.published);
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   // Live math preview: renders the current document (with KaTeX) so the author
   // can check formulas without leaving the editor.
@@ -145,6 +148,54 @@ export default function Editor({ post, categories }: Props) {
     if (!slugTouched) setSlug(slugify(v));
   }
 
+  // True when the document is just the empty starter paragraph, so importing
+  // can safely replace it rather than appending.
+  function docIsEmpty(): boolean {
+    const doc = editor.document;
+    if (doc.length === 0) return true;
+    if (doc.length > 1) return false;
+    const only: any = doc[0];
+    const content = only?.content;
+    if (!Array.isArray(content)) return true;
+    return content.every((c: any) => !c?.text || !c.text.trim());
+  }
+
+  // Import an existing .md / .docx / .pdf file straight into the editor.
+  async function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-picking the same file
+    if (!file) return;
+    if (!docIsEmpty() && !confirm('Nội dung nhập vào sẽ được chèn tiếp vào cuối bài. Tiếp tục?')) {
+      return;
+    }
+    setImporting(true);
+    setStatus(`Đang nhập ${file.name}…`);
+    try {
+      const { html } = await fileToHtml(file);
+      const blocks = await editor.tryParseHTMLToBlocks(html);
+      if (!blocks.length) {
+        setStatus('Không đọc được nội dung từ file.');
+        return;
+      }
+      if (docIsEmpty()) {
+        editor.replaceBlocks(editor.document, blocks);
+      } else {
+        const last = editor.document[editor.document.length - 1];
+        editor.insertBlocks(blocks, last, 'after');
+      }
+      // Fill an empty title from the file name (minus extension).
+      if (!title.trim()) {
+        const base = file.name.replace(/\.[^.]+$/, '');
+        onTitle(base);
+      }
+      setStatus('Đã nhập ✓');
+    } catch (err: any) {
+      setStatus('Lỗi nhập file: ' + (err?.message || 'không rõ'));
+    } finally {
+      setImporting(false);
+    }
+  }
+
   async function save(nextPublished?: boolean) {
     if (!title.trim()) {
       setStatus('Please add a title first.');
@@ -196,6 +247,27 @@ export default function Editor({ post, categories }: Props) {
 
   return (
     <div className="ed">
+      <div className="ed__import">
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".md,.markdown,.txt,.docx,.pdf"
+          style={{ display: 'none' }}
+          onChange={onImportFile}
+        />
+        <button
+          className="ed__btn"
+          type="button"
+          disabled={importing}
+          onClick={() => importInputRef.current?.click()}
+        >
+          {importing ? 'Đang nhập…' : '⇪ Nhập file (.md / .docx / .pdf)'}
+        </button>
+        <span className="ed__import-hint">
+          Nhập bài viết có sẵn — nội dung vào thẳng editor, không phải chỉnh lại.
+        </span>
+      </div>
+
       <div className="ed__meta">
         <label className="ed__field ed__field--wide">
           <span>Title</span>

@@ -1,0 +1,206 @@
+---
+// Reader-facing "Download" dropdown shown at the foot of every post, sitting
+// right beside the "Back to …" chip. Clicking it opens a small menu to save the
+// article as Markdown (.md), Word (.docx) or PDF (browser print → "Save as
+// PDF"). The clean semantic `body_html` (raw `$…$` math still literal) is
+// stashed in a <template> for the md/docx conversion; PDF prints the
+// already-rendered article (KaTeX + site styles intact). The .docx is real
+// OOXML, so modern Word opens AND edits it and it re-imports through the editor.
+interface Props {
+  title: string;
+  html: string;
+  slug: string;
+}
+const { title, html, slug } = Astro.props;
+---
+
+<details class="post__dl" data-export data-title={title} data-slug={slug}>
+  <summary class="chip">
+    <svg class="post__dl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" />
+    </svg>
+    Download
+    <span class="post__dl-caret" aria-hidden="true">▾</span>
+  </summary>
+  <div class="post__dl-menu" role="menu">
+    <button class="post__dl-item" type="button" role="menuitem" data-export-md>Markdown (.md)</button>
+    <button class="post__dl-item" type="button" role="menuitem" data-export-doc>Word (.docx)</button>
+    <button class="post__dl-item" type="button" role="menuitem" data-export-pdf>PDF</button>
+  </div>
+  <template data-export-html set:html={html}></template>
+</details>
+
+<script>
+  import TurndownService from 'turndown';
+  import { gfm } from 'turndown-plugin-gfm';
+
+  const root = document.querySelector<HTMLDetailsElement>('[data-export]');
+  if (root) {
+    const title = root.dataset.title || 'post';
+    const slug = root.dataset.slug || 'post';
+    const tpl = root.querySelector<HTMLTemplateElement>('[data-export-html]');
+    // Source HTML for md/docx: semantic markup with raw `$…$` still literal.
+    const sourceHtml = tpl ? tpl.innerHTML : '';
+
+    const closeMenu = () => root.removeAttribute('open');
+
+    // Close the dropdown on outside-click or Escape.
+    document.addEventListener('click', (e) => {
+      if (root.open && !root.contains(e.target as Node)) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    function download(blob: Blob, ext: string) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${slug || 'post'}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // Markdown: convert the semantic HTML with Turndown (+ GFM tables/strikethrough).
+    root.querySelector('[data-export-md]')?.addEventListener('click', () => {
+      const td = new TurndownService({
+        headingStyle: 'atx',
+        codeBlockStyle: 'fenced',
+        bulletListMarker: '-',
+        emDelimiter: '*',
+      });
+      td.use(gfm);
+      const body = td.turndown(sourceHtml);
+      const md = `# ${title}\n\n${body}\n`;
+      download(new Blob([md], { type: 'text/markdown;charset=utf-8' }), 'md');
+      closeMenu();
+    });
+
+    // Word: a real .docx (OOXML). Generated in-browser from the article HTML so
+    // modern Word opens and edits it natively (and it re-imports cleanly).
+    root.querySelector('[data-export-doc]')?.addEventListener('click', async () => {
+      const btn = root.querySelector<HTMLButtonElement>('[data-export-doc]');
+      const label = btn?.textContent ?? '';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Đang tạo…';
+      }
+      try {
+        // The docx bundle expects Node's `global`; alias it to the browser global.
+        (window as any).global ||= window;
+        const { default: HTMLtoDOCX } = await import('@turbodocx/html-to-docx');
+        const html = `<h1>${title}</h1>${sourceHtml}`;
+        const out: any = await HTMLtoDOCX(html, null, {
+          table: { row: { cantSplit: true } },
+        });
+        // Browser build returns a Blob; be tolerant if it hands back bytes.
+        const blob =
+          out instanceof Blob
+            ? out
+            : new Blob([out], {
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              });
+        download(blob, 'docx');
+        closeMenu();
+      } catch (err) {
+        alert('Không tạo được file Word: ' + ((err as Error)?.message || err));
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = label;
+        }
+      }
+    });
+
+    // PDF: print the already-rendered article (math + styles intact). Print CSS
+    // hides the page chrome so the browser's "Save as PDF" yields a clean doc.
+    root.querySelector('[data-export-pdf]')?.addEventListener('click', () => {
+      closeMenu();
+      window.print();
+    });
+  }
+</script>
+
+<style>
+  .post__dl {
+    position: relative;
+  }
+  /* The trigger reuses the .chip look and font so it matches the Back button. */
+  .post__dl > summary {
+    font-family: var(--font-post);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .post__dl > summary::-webkit-details-marker {
+    display: none;
+  }
+  .post__dl-icon {
+    width: 1em;
+    height: 1em;
+  }
+  .post__dl-caret {
+    font-size: 0.85em;
+    transition: transform var(--dur-short) var(--ease-out);
+  }
+  .post__dl[open] .post__dl-caret {
+    transform: rotate(180deg);
+  }
+  .post__dl-menu {
+    position: absolute;
+    left: 0;
+    top: calc(100% + var(--space-2xs));
+    z-index: var(--z-overlay);
+    display: flex;
+    flex-direction: column;
+    min-width: 12rem;
+    padding: var(--space-2xs);
+    background: var(--color-paper-2);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-pop, 0 8px 24px rgba(0, 0, 0, 0.18));
+  }
+  .post__dl-item {
+    font-family: var(--font-post);
+    font-size: var(--text-sm);
+    text-align: left;
+    padding: var(--space-2xs) var(--space-xs);
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .post__dl-item:hover,
+  .post__dl-item:focus-visible {
+    background: color-mix(in oklch, var(--color-accent) 22%, transparent);
+  }
+  .post__dl-item:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+</style>
+
+<style is:global>
+  /* PDF export = browser print. Strip the reader chrome so only the article
+     prints. Fixed backgrounds/scrims are cleared for a clean white page. */
+  @media print {
+    .theme-toggle,
+    .toc,
+    .post__crumbs,
+    .post__foot {
+      display: none !important;
+    }
+    .post {
+      padding-block: 0 !important;
+    }
+    .page {
+      max-width: none !important;
+    }
+  }
+</style>
