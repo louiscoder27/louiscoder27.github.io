@@ -63,13 +63,15 @@ const fmt = (s: string) =>
                 </td>
                 <td class="tnum">{fmt(p.updated_at)}</td>
                 <td class="dash__actions">
-                  {p.published && (
-                    <a class="dash__link" href={`/blog/${p.slug}`} target="_blank">View</a>
-                  )}
-                  <button class="dash__link" data-action="toggle">
-                    {p.published ? 'Unpublish' : 'Publish'}
-                  </button>
-                  <button class="dash__link dash__link--danger" data-action="delete">Delete</button>
+                  <div class="dash__actions-row">
+                    {p.published && (
+                      <a class="dash__link" href={`/blog/${p.slug}`} target="_blank">View</a>
+                    )}
+                    <button class="dash__link" data-action="toggle">
+                      {p.published ? 'Unpublish' : 'Publish'}
+                    </button>
+                    <button class="dash__link dash__link--danger" data-action="delete">Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -119,6 +121,7 @@ const fmt = (s: string) =>
   .dash {
     max-width: 60rem;
     padding-block: var(--space-lg) var(--space-2xl);
+    font-family: var(--font-post);
   }
   .dash__head {
     display: flex;
@@ -145,7 +148,7 @@ const fmt = (s: string) =>
   }
   .dash__new {
     padding: 0.55rem 1rem;
-    font-family: var(--font-display);
+    font-family: var(--font-post);
     font-weight: 700;
     font-size: var(--text-sm);
     color: var(--color-accent-ink);
@@ -155,7 +158,7 @@ const fmt = (s: string) =>
   }
   .dash__logout {
     padding: 0.55rem 0.9rem;
-    font-family: var(--font-display);
+    font-family: var(--font-post);
     font-weight: 600;
     font-size: var(--text-sm);
     color: var(--color-ink-2);
@@ -174,7 +177,7 @@ const fmt = (s: string) =>
   }
   .dash__table th {
     text-align: left;
-    font-family: var(--font-display);
+    font-family: var(--font-post);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: var(--text-xs);
@@ -188,11 +191,14 @@ const fmt = (s: string) =>
     vertical-align: middle;
   }
   .dash__cell-title {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
+    vertical-align: top;
+  }
+  .dash__cell-title .link {
+    display: inline-block;
   }
   .dash__slug {
+    display: block;
+    margin-top: 0.15rem;
     color: var(--color-muted);
     font-size: var(--text-xs);
   }
@@ -212,6 +218,9 @@ const fmt = (s: string) =>
     color: var(--color-ink-2);
   }
   .dash__actions {
+    vertical-align: top;
+  }
+  .dash__actions-row {
     display: flex;
     gap: 0.75rem;
     white-space: nowrap;

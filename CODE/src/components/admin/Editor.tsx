@@ -261,11 +261,8 @@ export default function Editor({ post, categories }: Props) {
           disabled={importing}
           onClick={() => importInputRef.current?.click()}
         >
-          {importing ? 'Đang nhập…' : '⇪ Nhập file (.md / .docx / .pdf)'}
+          {importing ? 'Đang nhập…' : 'Import'}
         </button>
-        <span className="ed__import-hint">
-          Nhập bài viết có sẵn — nội dung vào thẳng editor, không phải chỉnh lại.
-        </span>
       </div>
 
       <div className="ed__meta">
@@ -310,12 +307,6 @@ export default function Editor({ post, categories }: Props) {
           />
         </label>
       </div>
-
-      <p className="ed__hint">
-        Toán học: gõ LaTeX giữa <code>$…$</code> cho công thức trong dòng (vd{' '}
-        <code>$\hat{'{'}y{'}'} = \beta_0 + \beta_1 x$</code>) hoặc{' '}
-        <code>$$…$$</code> cho công thức riêng dòng. Bật “Xem trước” để kiểm tra.
-      </p>
 
       <div className="ed__editor">
         <BlockNoteView

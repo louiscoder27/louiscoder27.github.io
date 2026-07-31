@@ -5,18 +5,7 @@
 }
 .ed__import {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 0.9rem;
-  padding: 0.75rem 0.9rem;
-  background: var(--color-paper-2);
-  border: var(--rule-hair) dashed var(--color-rule);
-  border-radius: var(--radius-md);
-}
-.ed__import-hint {
-  font-family: var(--font-post);
-  font-size: var(--text-xs);
-  color: var(--color-muted);
 }
 .ed__meta {
   display: grid;
@@ -152,28 +141,18 @@ html[data-theme='dark'] .ed__editor [data-content-type='heading'] {
 .ed__editor [data-background-color='purple'] { background-color: var(--bg-purple); }
 .ed__editor [data-background-color='pink'] { background-color: var(--bg-pink); }
 
-/* Math help line above the writing surface. */
-.ed__hint {
-  font-family: var(--font-post);
-  font-size: var(--text-sm);
-  line-height: 1.5;
-  color: var(--color-muted);
-  margin: -0.25rem 0 0;
-}
-.ed__hint code {
-  font-family: var(--font-post);
-  padding: 0.05rem 0.3rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-paper-3);
-  color: var(--color-ink-2);
-}
-
 /* Live math preview — mirrors the reader article (.prose) with rendered KaTeX. */
 .ed__preview {
   border: var(--rule-hair) solid var(--color-rule);
   border-radius: var(--radius-md);
   background: var(--color-paper-2);
   padding: 1rem 1.25rem 1.25rem;
+}
+/* Preview uses the JetBrains Mono post face throughout — including headings,
+   which .prose otherwise renders in the pixel display font. */
+.ed__preview .prose,
+.ed__preview .prose :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-post);
 }
 .ed__preview-label {
   font-family: var(--font-post);
