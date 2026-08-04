@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ThemeToggle from '../../components/ThemeToggle.astro';
+import { categorySlug } from '../../lib/categories';
 
 const supabase = Astro.locals.supabase!;
 const user = Astro.locals.user;
@@ -65,7 +66,7 @@ const fmt = (s: string) =>
                 <td class="dash__actions">
                   <div class="dash__actions-row">
                     {p.published && (
-                      <a class="dash__link" href={`/blog/${p.slug}`} target="_blank">View</a>
+                      <a class="dash__link" href={`/${categorySlug(p.category)}/${p.slug}`} target="_blank">View</a>
                     )}
                     <button class="dash__link" data-action="toggle">
                       {p.published ? 'Unpublish' : 'Publish'}

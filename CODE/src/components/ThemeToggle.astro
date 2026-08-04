@@ -78,7 +78,7 @@
       btn.setAttribute('aria-pressed', String(dark));
       btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
       var meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', dark ? '#23212C' : '#EBE9DD');
+      if (meta) meta.setAttribute('content', dark ? '#080616' : '#EBE9DD');
       // Let React islands (BlockNote editor) react to the theme change.
       document.dispatchEvent(new CustomEvent('themechange', { detail: { dark: dark } }));
     }

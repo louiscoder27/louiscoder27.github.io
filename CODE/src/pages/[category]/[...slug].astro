@@ -1,0 +1,62 @@
+---
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getPostBySlug } from '../../lib/posts';
+import { highlightCodeBlocks } from '../../lib/highlight';
+import { buildToc } from '../../lib/toc';
+import { categoryFromSlug, categorySlug } from '../../lib/categories';
+
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
+
+const { category, slug } = Astro.params;
+
+// The category segment must be a real category slug (vault | courses | projects).
+// Anything else is an unrelated path — 404 rather than guess.
+const cat = category ? categoryFromSlug(category) : undefined;
+if (!cat) {
+  return new Response(null, { status: 404, statusText: 'Not found' });
+}
+
+// `/courses` with no slug is the category itself — send it to the home page's
+// in-page panel for that section.
+if (!slug) {
+  return Astro.redirect(withBase(`/#${categorySlug(cat)}`));
+}
+
+const post = await getPostBySlug(slug);
+if (!post) {
+  return new Response(null, { status: 404, statusText: 'Post not found' });
+}
+
+// One canonical URL per post: if the post lives in a different category than the
+// one in the URL, redirect to its real category path instead of rendering a
+// duplicate (e.g. /vault/<a-courses-post> → /courses/<a-courses-post>).
+if (post.data.category !== cat) {
+  return Astro.redirect(withBase(`/${categorySlug(post.data.category)}/${slug}`));
+}
+
+// The editor stores code blocks as plain text; colour their tokens here.
+const highlighted = await highlightCodeBlocks(post.body_html);
+// Give every heading a stable anchor id and derive the table of contents.
+const { html: bodyHtml, toc } = buildToc(highlighted);
+
+// Cache the rendered page at the edge; revalidate in the background so a freshly
+// published/edited post shows up quickly without hammering the database.
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, max-age=0, s-maxage=60, stale-while-revalidate=600',
+);
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  category={post.data.category}
+  toc={toc}
+  slug={post.id}
+  exportHtml={post.body_html}
+>
+  <Fragment set:html={bodyHtml} />
+</PostLayout>

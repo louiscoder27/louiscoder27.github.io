@@ -1,5 +1,5 @@
 Dark mode:
-ink void (#23212C) sử dụng màu này làm nền
+--color-paper: #080616; sử dụng màu này làm nền
 Vanilla Cream (#282B4A) nội dung post sử dụng màu này
 Các tiêu đề khác hãy giữ nguyên
 

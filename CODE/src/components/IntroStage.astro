@@ -29,6 +29,10 @@ interface Props {
 // Stats + list data are passed in from the page so they stay derived from real content.
 const { postsCount, projectsCount, years, latest, sections } = Astro.props;
 
+// Footer content moved up under the quote (the old dark footer bar is dropped
+// on the home page). Same links/credit as Footer.astro.
+const year = new Date().getFullYear();
+
 const base = import.meta.env.BASE_URL;
 const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
 
@@ -41,29 +45,28 @@ const affiliation = 'Investments Economics';
 const bio = 'Investments student from UEH. Focus on finance, mathematics, econometrics.';
 const fields = ['Finance', 'Mathematics', 'Econometrics'];
 
-// Section navigation rail (replaces the old Sections list). Each icon links to a
-// category page; the rail is collapsed to icons and expands on hover to labels.
-const leafIcon =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20C4 13 8 5 20 4c-1 12-7 16-15 16z"/><path d="M5 20 13 12"/></svg>';
-const railIcons: Record<string, string> = {
+// Persistent top-left nav. Collapsed to a single "categories" grid icon; on
+// hover it expands into a tall vertical strip down the left edge listing every
+// destination. Home + About are scroll anchors; each category is a tab that
+// swaps the work box in place. `key` doubles as the hash and the data-tab.
+const menuIcon =
+  '<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="m10.357 13.262c-.049-.011-1.205-.262-2.357-.262s-2.309.251-2.357.262c-.19.042-.339.19-.381.381-.011.049-.262 1.205-.262 2.357s.251 2.309.262 2.357c.042.19.19.339.381.381.049.011 1.205.262 2.357.262s2.309-.251 2.357-.262c.19-.042.339-.19.381-.381.011-.049.262-1.205.262-2.357s-.251-2.309-.262-2.357c-.042-.19-.19-.339-.381-.381zm-.534 4.561c-.402.07-1.124.177-1.823.177s-1.421-.106-1.823-.177c-.07-.402-.177-1.124-.177-1.823s.106-1.421.177-1.823c.402-.07 1.124-.177 1.823-.177s1.421.106 1.823.177c.07.402.177 1.124.177 1.823s-.106 1.421-.177 1.823zm.534-12.561c-.049-.011-1.205-.262-2.357-.262s-2.309.251-2.357.262c-.19.042-.339.19-.381.381-.011.049-.262 1.205-.262 2.357s.251 2.309.262 2.357c.042.19.19.339.381.381.049.011 1.205.262 2.357.262s2.309-.251 2.357-.262c.19-.042.339-.19.381-.381.011-.049.262-1.205.262-2.357s-.251-2.309-.262-2.357c-.042-.19-.19-.339-.381-.381zm-.534 4.561c-.402.071-1.124.177-1.823.177s-1.421-.106-1.823-.177c-.07-.402-.177-1.124-.177-1.823s.106-1.421.177-1.823c.402-.071 1.124-.177 1.823-.177s1.421.106 1.823.177c.07.402.177 1.124.177 1.823s-.106 1.421-.177 1.823zm12.115-7.38c-.042-.191-.19-.34-.381-.381-.049-.011-4.891-1.062-9.558-1.062s-9.508 1.051-9.557 1.062c-.19.042-.339.19-.381.381-.011.048-1.062 4.891-1.062 9.557s1.051 9.509 1.062 9.558c.042.19.19.339.381.381.049.011 4.891 1.062 9.558 1.062s9.509-1.051 9.558-1.062c.19-.042.339-.19.381-.381.011-.049 1.062-4.891 1.062-9.558s-1.051-9.509-1.062-9.557zm-.911 18.584c-1.137.228-5.148.973-9.027.973s-7.891-.745-9.027-.973c-.228-1.137-.973-5.148-.973-9.027s.745-7.891.973-9.027c1.137-.228 5.148-.973 9.027-.973s7.891.745 9.027.973c.228 1.136.973 5.148.973 9.027s-.745 7.891-.973 9.027zm-2.67-15.765c-.049-.011-1.205-.262-2.357-.262s-2.309.251-2.357.262c-.19.042-.339.19-.381.381-.011.049-.262 1.205-.262 2.357s.251 2.309.262 2.357c.042.19.19.339.381.381.049.011 1.205.262 2.357.262s2.309-.251 2.357-.262c.19-.042.339-.19.381-.381.011-.049.262-1.205.262-2.357s-.251-2.309-.262-2.357c-.042-.19-.19-.339-.381-.381zm-.534 4.561c-.402.071-1.124.177-1.823.177s-1.421-.106-1.823-.177c-.07-.402-.177-1.124-.177-1.823s.106-1.421.177-1.823c.402-.071 1.124-.177 1.823-.177s1.421.106 1.823.177c.07.402.177 1.124.177 1.823s-.106 1.421-.177 1.823zm.534 3.439c-.049-.011-1.205-.262-2.357-.262s-2.309.251-2.357.262c-.19.042-.339.19-.381.381-.011.049-.262 1.205-.262 2.357s.251 2.309.262 2.357c.042.19.19.339.381.381.049.011 1.205.262 2.357.262s2.309-.251 2.357-.262c.19-.042.339-.19.381-.381.011-.049.262-1.205.262-2.357s-.251-2.309-.262-2.357c-.042-.19-.19-.339-.381-.381zm-.534 4.561c-.402.07-1.124.177-1.823.177s-1.421-.106-1.823-.177c-.07-.402-.177-1.124-.177-1.823s.106-1.421.177-1.823c.402-.07 1.124-.177 1.823-.177s1.421.106 1.823.177c.07.402.177 1.124.177 1.823s-.106 1.421-.177 1.823z"/></svg>';
+const navIcons: Record<string, string> = {
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/></svg>',
+  about:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/></svg>',
   vault:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M12 12v-2M12 12l1.6 1.2"/><path d="M12 4v2M12 20v-2"/></svg>',
   courses:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7v15H6a2 2 0 0 1-2-2z"/><path d="M20 5h-7v15h5a2 2 0 0 0 2-2z"/></svg>',
   projects:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h3l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>',
-  blog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
 };
-// The rail and bottom nav are the "tabs" that swap the content inside the work
-// box. Home shows the default "Latest posts" view; each section shows its own
-// title + post list in the same box. `key` doubles as the hash and the data-tab.
-const railItems = [
+const navItems = [
   { label: 'Home', href: '#home', key: 'home' },
+  { label: 'About', href: '#about', key: 'about' },
   ...sections.map((s) => ({ label: s.name, href: `#${s.slug}`, key: s.slug })),
 ];
-
-const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
 ---
 
 <section id="home" class="intro" aria-label="Introduction">
@@ -93,6 +96,29 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
       <source src={withBase('/background.mp4')} type="video/mp4" />
     </video>
     <div class="intro__grade" aria-hidden="true"></div>
+
+    <!-- Persistent top-left nav — collapsed to a single grid icon, expands on
+         hover into a tall vertical strip. Present across all three slides;
+         replaces the old bottom nav and the work-box rail. Category items carry
+         data-tab to swap the box. The script flips it to open upward when
+         opening downward would overrun the viewport bottom. -->
+    <nav class="topnav" aria-label="Primary" data-topnav>
+      <span class="topnav__toggle" aria-hidden="true">
+        <span class="topnav__ic topnav__ic--menu" set:html={menuIcon} />
+      </span>
+      <ul class="topnav__list">
+        {
+          navItems.map((it) => (
+            <li>
+              <a class="topnav__item" href={it.href} data-tab={it.key}>
+                <span class="topnav__ic" set:html={navIcons[it.key]} />
+                <span class="topnav__label">{it.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
 
     <!-- Layer 1 — the name, revealed by a slow decoding scramble that cycles
          between "Louis" and "Hello" forever. JS drives the per-character spans;
@@ -150,25 +176,6 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     <div class="intro__layer intro__layer--work" aria-labelledby="work-heading">
       <h2 id="work-heading" class="sr-only">Latest posts and sections</h2>
       <div class="work glass">
-        <!-- Section navigation rail — the tabs that swap the box content below -->
-        <nav class="wnav" aria-label="Sections">
-          <a class="wnav__logo" href="#home" data-tab="home" aria-label="Home">
-            <span class="wnav__ic" set:html={leafIcon} />
-          </a>
-          <ul class="wnav__list">
-            {
-              railItems.map((it) => (
-                <li>
-                  <a class="wnav__item" href={it.href} data-tab={it.key}>
-                    <span class="wnav__ic" set:html={railIcons[it.key]} />
-                    <span class="wnav__label">{it.label}</span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-
         <!-- One swappable view per tab. Home = latest posts; each section shows
              its own title + posts. Only the active view is displayed. -->
         <div class="work__body">
@@ -230,7 +237,8 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
       </div>
     </div>
 
-    <!-- Persistent footer — same quote + nav on both slides -->
+    <!-- Persistent footer quote (nav moved to the fixed top-left rail). The old
+         dark footer bar's content now sits right under the quote, in white. -->
     <div class="intro__bar">
       {
         SITE.hero.quotes.length > 0 && (
@@ -241,22 +249,22 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
           </div>
         )
       }
-      <nav class="intro__nav" aria-label="Primary">
+      <p class="intro__foot">
+        <span class="intro__foot-mark">{SITE.title}</span>
         {
-          nav.map((item, i) => (
+          SITE.links.map((l) => (
             <>
-              {i > 0 && <span class="intro__sep" aria-hidden="true">·</span>}
-              <a class="intro__link" href={item.href} data-tab={item.key}>{item.label}</a>
+              <span class="intro__foot-sep" aria-hidden="true">·</span>
+              <a class="intro__foot-link" href={l.href}>{l.label}</a>
             </>
           ))
         }
-      </nav>
+        <span class="intro__foot-sep" aria-hidden="true">·</span>
+        <span class="intro__foot-copy">© {year}</span>
+      </p>
     </div>
   </div>
 
-  <!-- Scroll targets for nav/links — each lands where its slide is shown. -->
-  <span id="about" class="intro__anchor" style="top: 26%" aria-hidden="true"></span>
-  <span id="work" class="intro__anchor" style="top: 66%" aria-hidden="true"></span>
 </section>
 
 <style is:global>
@@ -268,22 +276,17 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
 </style>
 
 <style define:vars={{ meadow: `url('${withBase('/background.jpg')}')` }}>
-  /* Tall so there's scroll travel to drive the crossfade; the sticky child
-     stays pinned to the viewport the whole way (one screen, no page change). */
+  /* One fixed screen; the nav crossfades the layers in place (no page change). */
   .intro {
     position: relative;
-    height: 380svh;
+    /* One fixed screen — no scroll travel. The nav (not scrolling) crossfades
+       between the wordmark, About and the work box. */
+    height: 100svh;
     background: var(--color-ink);
-  }
-  .intro__anchor {
-    position: absolute;
-    left: 0;
-    width: 1px;
-    height: 1px;
   }
 
   .intro__sticky {
-    position: sticky;
+    position: relative;
     top: 0;
     height: 100svh;
     overflow: clip;
@@ -320,8 +323,9 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     pointer-events: none;
   }
 
-  /* Both layers occupy the same centred viewport box — one crossfades into the
-     other in place. In the no-JS/static fallback they simply stack. */
+  /* All three layers occupy the same centred box; the nav crossfades one into
+     the next in place (opacity/blur/scale animate via these transitions). Only
+     the active layer is interactive. In the no-JS/static fallback they stack. */
   .intro__layer {
     position: absolute;
     inset: 0;
@@ -329,6 +333,14 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     display: grid;
     place-items: center;
     padding: clamp(3rem, 8vh, 6rem) var(--page-gutter) clamp(6rem, 14vh, 9rem);
+    pointer-events: none;
+    transition:
+      opacity 520ms var(--ease-in-out),
+      filter 520ms var(--ease-in-out),
+      transform 520ms var(--ease-in-out);
+  }
+  .intro__layer.is-active {
+    pointer-events: auto;
   }
   .intro__layer--name {
     opacity: var(--name-op, 1);
@@ -337,19 +349,11 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     opacity: var(--about-op, 0);
     filter: blur(calc((1 - var(--about-op, 0)) * 16px));
     transform: scale(calc(0.97 + var(--about-op, 0) * 0.03));
-    pointer-events: none;
-  }
-  .intro__layer--about.is-active {
-    pointer-events: auto;
   }
   .intro__layer--work {
     opacity: var(--work-op, 0);
     filter: blur(calc((1 - var(--work-op, 0)) * 16px));
     transform: scale(calc(0.97 + var(--work-op, 0) * 0.03));
-    pointer-events: none;
-  }
-  .intro__layer--work.is-active {
-    pointer-events: auto;
   }
 
   /* ---- The scrambling wordmark (Crude font) ---- */
@@ -559,92 +563,130 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     display: flex;
     align-items: stretch;
     padding: clamp(1.1rem, 2.4vw, 1.9rem);
-    padding-left: clamp(4.75rem, 7vw, 6rem); /* clearance for the collapsed rail */
   }
 
-  /* Vertical nav rail — collapsed to icons, expands on hover to reveal labels. */
-  .wnav {
+  /* ---- Persistent top-left nav rail ----
+     Pinned to the top-left of the sticky stage, present on every slide.
+     Collapsed it shows a single grid icon; on hover it expands into a tall
+     vertical strip down the left edge, revealing every destination with labels.
+     `.is-up` (set by the script) flips it to open upward — used when opening
+     downward would run past the bottom of the viewport / into content. */
+  .topnav {
     position: absolute;
     top: clamp(1.1rem, 2.4vw, 1.9rem);
     left: clamp(1.1rem, 2.4vw, 1.9rem);
-    bottom: clamp(1.1rem, 2.4vw, 1.9rem);
-    width: clamp(3.25rem, 4vw, 3.75rem);
-    z-index: 3;
+    z-index: 5;
+    /* Collapsed: a fixed square that snugly wraps the toggle (2.5rem icon box +
+       2×0.6rem padding + 1px borders), so the icon reads perfectly centred at any
+       screen scale — no viewport-relative width to drift. `gap` is 0 while
+       collapsed so the (empty) list below doesn't push the icon off-centre; it
+       returns on hover to space the toggle from the list. */
+    width: 3.85rem;
     display: flex;
     flex-direction: column;
-    gap: clamp(0.5rem, 1.4vh, 1rem);
+    gap: 0;
     padding: 0.6rem;
-    border-radius: 1.9rem;
+    border-radius: 1.6rem;
     background: color-mix(in oklch, #23212c 60%, transparent); /* Ink Void — matches the footer */
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
     border: 1px solid color-mix(in oklch, var(--sheen-color) 22%, transparent);
     box-shadow: 0 18px 40px color-mix(in oklch, var(--shadow-color) 45%, transparent);
     overflow: hidden;
-    /* Slightly slower, gentler open/close. */
-    transition: width 440ms var(--ease-out);
+    /* Slow, mellow open/close. */
+    transition: width 680ms var(--ease-in-out);
   }
-  .wnav:hover,
-  .wnav:focus-within {
-    width: clamp(11rem, 16vw, 13rem);
+  /* Open upward: bottom is pinned (in px, by the script) and the children stack
+     in reverse so the grid icon stays put while items grow above it. */
+  .topnav.is-up {
+    top: auto;
+    flex-direction: column-reverse;
   }
-  .wnav__logo,
-  .wnav__item {
+  .topnav:hover,
+  .topnav:focus-within {
+    width: clamp(12rem, 17vw, 14rem);
+    gap: 0.4rem;
+  }
+
+  /* Collapsed handle — the grid icon that's always visible. Always pinned to the
+     left of the column (both collapsed and expanded, so it never drifts to the
+     middle); the glyph is centred inside its own square box via place-items. When
+     collapsed the pill is exactly this box's width, so "left" reads as centred. */
+  .topnav__toggle {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-inline: 0;
+    border-radius: 0.9rem;
+    color: var(--sheen-color);
+  }
+  .topnav__ic--menu :global(svg) {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .topnav__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    /* Hidden until hover — clipped so the collapsed pill is just the icon. */
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      max-height 680ms var(--ease-in-out),
+      opacity 520ms var(--ease-in-out);
+  }
+  .topnav.is-up .topnav__list {
+    flex-direction: column-reverse;
+  }
+  .topnav:hover .topnav__list,
+  .topnav:focus-within .topnav__list {
+    max-height: 80vh;
+    opacity: 1;
+  }
+  .topnav__item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-    border-radius: 999px;
+    /* Icons stay left-aligned in every state so they don't snap to the middle
+       (like the toggle) while the strip collapses — the list is hidden when
+       collapsed, so left alignment is only ever seen while open. */
+    justify-content: flex-start;
+    /* Taller items so the expanded strip reads as a long left-edge bar. */
+    padding: 0.7rem 0.55rem;
+    border-radius: 0.9rem;
     color: var(--sheen-color);
     white-space: nowrap;
     transition: background-color var(--dur-short) var(--ease-out);
   }
-  .wnav__logo { margin-bottom: 0.3rem; }
-  .wnav:hover .wnav__logo,
-  .wnav:hover .wnav__item,
-  .wnav:focus-within .wnav__logo,
-  .wnav:focus-within .wnav__item {
-    justify-content: flex-start;
-  }
-  .wnav__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.3rem;
-  }
-  .wnav__item:hover,
-  .wnav__logo:hover {
+  .topnav__item:hover {
     background: color-mix(in oklch, var(--sheen-color) 16%, transparent);
   }
   /* Active tab (the view currently shown in the box) — solid warm gold so it
      clearly stands out against the dark rail, not the muted fern accent. */
-  .wnav__item[data-current],
-  .wnav__item[data-current]:hover {
+  .topnav__item[data-current],
+  .topnav__item[data-current]:hover {
     background: var(--color-light-gold);
     color: var(--color-ink);
     box-shadow: 0 4px 14px color-mix(in oklch, var(--color-light-gold) 45%, transparent);
   }
-  .wnav__ic {
+  .topnav__ic {
     flex: 0 0 auto;
     display: grid;
     place-items: center;
     width: 2rem;
     height: 2rem;
   }
-  .wnav__ic :global(svg) {
+  .topnav__ic :global(svg) {
     width: 1.25rem;
     height: 1.25rem;
   }
-  .wnav__logo .wnav__ic {
-    background: color-mix(in oklch, var(--sheen-color) 92%, transparent);
-    border-radius: 999px;
-    color: var(--color-slate);
-  }
-  .wnav__label {
+  .topnav__label {
     font-family: var(--font-post);
     font-size: var(--text-sm);
     font-weight: 600;
@@ -654,13 +696,13 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     overflow: hidden;
     opacity: 0;
     transform: translateX(-6px);
-    transition: max-width 440ms var(--ease-out),
-      margin-left 440ms var(--ease-out),
-      opacity 300ms var(--ease-out),
-      transform 300ms var(--ease-out);
+    transition: max-width 680ms var(--ease-in-out),
+      margin-left 680ms var(--ease-in-out),
+      opacity 520ms var(--ease-in-out),
+      transform 520ms var(--ease-in-out);
   }
-  .wnav:hover .wnav__label,
-  .wnav:focus-within .wnav__label {
+  .topnav:hover .topnav__label,
+  .topnav:focus-within .topnav__label {
     max-width: 10rem;
     margin-left: 0.8rem;
     opacity: 1;
@@ -817,26 +859,9 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     white-space: nowrap;
   }
 
-  /* Narrow: rail becomes a horizontal strip above the content. */
+  /* Narrow: the box content spans the full width (the nav rail is now the fixed
+     top-left one, outside the box). */
   @media (max-width: 720px) {
-    .work {
-      flex-direction: column;
-      padding-left: clamp(1.1rem, 2.4vw, 1.9rem);
-    }
-    .wnav {
-      position: static;
-      width: 100%;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      border-radius: 999px;
-      /* clear the rail's drop shadow (0 18px 40px) so it doesn't fall on the header */
-      margin-bottom: 2.5rem;
-    }
-    .wnav:hover,
-    .wnav:focus-within { width: 100%; }
-    .wnav__list { flex-direction: row; }
-    .wnav__label { display: none; }
     .work__body { padding-left: 0; }
   }
 
@@ -889,50 +914,39 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     letter-spacing: 0.01em;
     text-shadow: 0 1px 18px color-mix(in oklch, var(--shadow-color) 60%, transparent);
   }
-  .intro__nav {
+  /* Footer content relocated under the quote — same font as the old footer bar
+     (--font-display), rendered in white. */
+  .intro__foot {
+    margin: 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: baseline;
-    gap: var(--space-sm);
-  }
-  .intro__sep {
-    color: var(--hero-ink);
-    opacity: 0.5;
-  }
-  .intro__link {
+    gap: var(--space-2xs) var(--space-sm);
     font-family: var(--font-display);
     font-size: var(--text-sm);
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--hero-ink);
-    white-space: nowrap;
-    padding-bottom: 3px;
-    border-bottom: 2px solid transparent;
-    transition: border-color var(--dur-short) var(--ease-out);
+    color: #fff;
     text-shadow: 0 1px 18px color-mix(in oklch, var(--shadow-color) 60%, transparent);
   }
-  .intro__link:hover {
-    border-bottom-color: var(--hero-ink);
+  .intro__foot-mark {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #fff;
   }
-  /* Active item in the bottom nav — warm gold to match the rail's active tab. */
-  .intro__link[data-current] {
-    color: var(--color-light-gold);
-    border-bottom-color: var(--color-light-gold);
+  .intro__foot-sep,
+  .intro__foot-copy {
+    color: #fff;
   }
-  .intro__link:focus-visible {
-    outline: 2px solid var(--hero-ink);
-    outline-offset: 3px;
+  .intro__foot-link {
+    color: #fff;
+    white-space: nowrap;
+    padding-bottom: 1px;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-short) var(--ease-out);
   }
-
-  /* ---- Mobile footer: keep only the quote ----
-     On phones the bottom nav duplicates the work-box rail, so drop it and let
-     the quote stand alone. */
-  @media (max-width: 640px) {
-    .intro__nav {
-      display: none;
-    }
+  .intro__foot-link:hover {
+    border-bottom-color: #fff;
   }
   /* When the quote box would collide with the centred info/work box, a small
      script measures the overlap and adds this class — drop the whole footer
@@ -1098,45 +1112,12 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
 
   // Drive a three-stage in-place crossfade from scroll position:
   // name → about → work, each dissolving into the next over the fixed meadow.
+  // The slides no longer respond to scroll — the top-left nav is the only
+  // control. These refs are the three layers the nav crossfades between.
   const section = document.querySelector<HTMLElement>('.intro');
+  const nameLayer = document.querySelector<HTMLElement>('.intro__layer--name');
   const about = document.querySelector<HTMLElement>('.intro__layer--about');
   const work = document.querySelector<HTMLElement>('.intro__layer--work');
-
-  if (section && about && work) {
-    const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
-    let ticking = false;
-
-    const update = () => {
-      ticking = false;
-      const travel = section.offsetHeight - window.innerHeight;
-      const scrolled = Math.min(Math.max(-section.getBoundingClientRect().top, 0), travel);
-      const p = travel > 0 ? scrolled / travel : 0;
-
-      // Stage 1: name fades out (gone by ~17%).
-      const nameOp = 1 - clamp((p - 0.04) / 0.13);
-      // Stage 2: about fades in (~14%→26%), holds, fades out (~44%→56%).
-      const aboutOp = Math.min(clamp((p - 0.14) / 0.12), 1 - clamp((p - 0.44) / 0.12));
-      // Stage 3: work panel fades in (~58%→72%) and holds to the end.
-      const workOp = clamp((p - 0.58) / 0.14);
-
-      section.style.setProperty('--name-op', nameOp.toFixed(3));
-      section.style.setProperty('--about-op', aboutOp.toFixed(3));
-      section.style.setProperty('--work-op', workOp.toFixed(3));
-      about.classList.toggle('is-active', aboutOp > 0.5);
-      work.classList.toggle('is-active', workOp > 0.5);
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    update();
-  }
 
   // ---- Tabbed content inside the work box ----
   // The rail, the bottom nav, and deep-links from post pages all set the URL
@@ -1150,11 +1131,69 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
   // After a mouse click, a rail link keeps :focus, which holds the rail open
   // (via :focus-within) until you click elsewhere. Drop focus so the rail
   // collapses as soon as the pointer leaves it.
-  document.querySelectorAll<HTMLElement>('.wnav a').forEach((link) => {
+  document.querySelectorAll<HTMLElement>('.topnav a').forEach((link) => {
     link.addEventListener('click', () => {
       requestAnimationFrame(() => link.blur());
     });
   });
+
+  // ---- Top-left nav: open upward when opening down would overrun the screen ----
+  // Collapsed, the nav is a single icon at the top-left. Expanded, it grows into
+  // a tall strip. If, from its current top, the fully-open strip would extend
+  // past the bottom of the viewport (i.e. collide with content / run off-screen),
+  // pin it to open *upward* instead: the grid icon keeps its place while the
+  // items stack above it.
+  const topnav = document.querySelector<HTMLElement>('[data-topnav]');
+  if (topnav) {
+    const MARGIN = 16; // px of breathing room to keep at the viewport edge
+    const list = topnav.querySelector<HTMLElement>('.topnav__list');
+    let open = false;
+    let openH = 0;
+
+    // The strip's fully-open height, computed *without* forcing the element open
+    // — so it never disables (and thus never clobbers) the hover-open transition,
+    // and never flashes on load. A clipped list still reports its full content
+    // height via scrollHeight.
+    const measure = () => {
+      const cs = getComputedStyle(topnav);
+      const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      const borderY = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+      const rootFont = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const gap = 0.4 * rootFont; // the container's open gap between toggle + list
+      const toggle = topnav.querySelector<HTMLElement>('.topnav__toggle')?.offsetHeight ?? 40;
+      openH = padY + borderY + toggle + gap + (list?.scrollHeight ?? 0);
+    };
+
+    // Resting state: collapsed, top-anchored (grid icon top-left).
+    const reset = () => {
+      topnav.classList.remove('is-up');
+      topnav.style.bottom = '';
+    };
+
+    // If opening downward from the icon would run past the bottom of the
+    // viewport, flip to open upward — the strip pins to the bottom edge and, via
+    // column-reverse, the grid icon sits at the bottom while items grow above it.
+    const orient = () => {
+      reset();
+      const top = topnav.getBoundingClientRect().top;
+      if (top + openH + MARGIN > window.innerHeight) {
+        topnav.style.bottom = `${MARGIN}px`;
+        topnav.classList.add('is-up');
+      }
+    };
+
+    // Only reorient/flip while it's actually open (hover or keyboard focus); at
+    // rest it always shows the collapsed icon at the top-left.
+    topnav.addEventListener('pointerenter', () => { open = true; orient(); });
+    topnav.addEventListener('pointerleave', () => { open = false; reset(); });
+    topnav.addEventListener('focusin', () => { open = true; orient(); });
+    topnav.addEventListener('focusout', (e) => {
+      if (!topnav.contains(e.relatedTarget as Node)) { open = false; reset(); }
+    });
+    window.addEventListener('resize', () => { measure(); if (open) orient(); }, { passive: true });
+
+    measure();
+  }
 
   if (section && views.length) {
     const hasView = (key: string) => views.some((v) => v.dataset.view === key);
@@ -1162,31 +1201,45 @@ const nav = railItems.map(({ label, href, key }) => ({ label, href, key }));
     const setView = (key: string) => {
       const active = hasView(key) ? key : 'home';
       views.forEach((v) => v.classList.toggle('is-active', v.dataset.view === active));
+    };
+
+    // Map the URL hash → which layer is shown (and, for the work box, which tab):
+    //   #home / (empty) → wordmark hero    #about → About cards
+    //   #work           → work box, Latest  #vault/#courses/#projects → that tab
+    const applyState = () => {
+      const key = (location.hash || '').replace('#', '');
+      let layer: 'name' | 'about' | 'work';
+      if (key === 'about') {
+        layer = 'about';
+      } else if (key === 'work') {
+        layer = 'work';
+        setView('home');
+      } else if (key && key !== 'home' && hasView(key)) {
+        layer = 'work';
+        setView(key);
+      } else {
+        layer = 'name';
+        setView('home');
+      }
+
+      section.style.setProperty('--name-op', layer === 'name' ? '1' : '0');
+      section.style.setProperty('--about-op', layer === 'about' ? '1' : '0');
+      section.style.setProperty('--work-op', layer === 'work' ? '1' : '0');
+
+      nameLayer?.classList.toggle('is-active', layer === 'name');
+      about?.classList.toggle('is-active', layer === 'about');
+      work?.classList.toggle('is-active', layer === 'work');
+
+      // Highlight the active nav item. Home is the resting default, so it never
+      // gets the active pill.
       tabLinks.forEach((a) =>
-        a.toggleAttribute('data-current', a.dataset.tab === active && active !== 'home'),
+        a.toggleAttribute('data-current', !!key && key !== 'home' && a.dataset.tab === key),
       );
     };
 
-    // Scroll the sticky stage so the work box is fully revealed (progress ~0.92).
-    const revealWork = (smooth: boolean) => {
-      const travel = section.offsetHeight - window.innerHeight;
-      if (travel <= 0) return;
-      window.scrollTo({
-        top: section.offsetTop + travel * 0.92,
-        behavior: smooth ? 'smooth' : 'auto',
-      });
-    };
-
-    const applyHash = (opts: { scroll?: boolean; smooth?: boolean } = {}) => {
-      const key = (location.hash || '').replace('#', '');
-      const isSection = key && key !== 'home' && hasView(key);
-      setView(isSection ? key : 'home');
-      if (isSection && opts.scroll) revealWork(opts.smooth ?? false);
-    };
-
-    window.addEventListener('hashchange', () => applyHash({ scroll: true, smooth: true }));
-    // Honour a deep-linked section on first load (e.g. /#vault from a post).
-    applyHash({ scroll: true, smooth: false });
+    window.addEventListener('hashchange', applyState);
+    // Honour a deep-linked slide on first load (e.g. /#vault from a post).
+    applyState();
   }
 
   // ---- Hide the footer when the quote collides with the content box ----

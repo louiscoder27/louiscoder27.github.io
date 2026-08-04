@@ -36,7 +36,7 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
 <BaseLayout title={title} description={description} themeToggle>
   <article class="post">
     <ThemeToggle />
-    <TableOfContents toc={toc} />
+    <div class="post__wrap">
     <div class="page">
       <p class="post__crumbs">
         <a class="link" href={homeHref}>Home</a>
@@ -68,6 +68,8 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
         </a>
         <PostExport title={title} html={exportHtml} slug={slug} />
       </div>
+    </div>
+    <TableOfContents toc={toc} />
     </div>
   </article>
 </BaseLayout>
@@ -103,6 +105,34 @@ const sectionHref = `${homeHref}#${categorySlug(category)}`;
     padding-block: var(--space-lg) 0;
     /* Whole article uses JetBrains Mono — cascades to title, dek, meta, prose. */
     font-family: var(--font-post);
+  }
+  /* Below the rail breakpoint the wrapper is a no-op; the TOC floats as a pill. */
+  .post__wrap {
+    display: block;
+  }
+  /* Wide screens: reserve a right-hand column for the sticky "On this page" rail.
+   * The pair (article + rail) is centred as a unit; the article keeps its own
+   * reading measure inside the first column. */
+  @media (min-width: 64rem) {
+    .post__wrap {
+      --toc-w: 13rem;
+      display: grid;
+      grid-template-columns: minmax(0, var(--post-measure)) var(--toc-w);
+      justify-content: center;
+      align-items: start;
+      gap: var(--space-xl);
+      max-width: calc(var(--post-measure) + var(--toc-w) + var(--space-xl));
+      margin-inline: auto;
+      padding-inline: var(--page-gutter);
+    }
+    /* Article blocks already centre themselves within the column — drop the
+     * auto margins so they sit flush-left against the rail's gap instead. */
+    .post__wrap .post__crumbs,
+    .post__wrap .post__head,
+    .post__wrap .post__rule,
+    .post__wrap .post__foot {
+      margin-inline: 0;
+    }
   }
   /* Reading column: wider than the old --measure and centred on the page. */
   .post__crumbs,

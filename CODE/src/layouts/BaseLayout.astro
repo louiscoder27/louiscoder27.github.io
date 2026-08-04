@@ -9,9 +9,10 @@ interface Props {
   title?: string;
   description?: string;
   themeToggle?: boolean;
+  hideFooter?: boolean;
 }
 
-const { title, description, themeToggle = false } = Astro.props;
+const { title, description, themeToggle = false, hideFooter = false } = Astro.props;
 const pageTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} — ${SITE.kicker}`;
 const pageDescription = description ?? SITE.description;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -57,7 +58,7 @@ const scriptFontFace =
          paint so post pages never flash light before the toggle script runs. */
       themeToggle && (
         <script is:inline>
-          {`(function(){try{if(localStorage.getItem('post-theme')!=='light'){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#23212C');}}catch(e){}})();`}
+          {`(function(){try{if(localStorage.getItem('post-theme')!=='light'){document.documentElement.setAttribute('data-theme','dark');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#080616');}}catch(e){}})();`}
         </script>
       )
     }
@@ -67,7 +68,7 @@ const scriptFontFace =
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    {!hideFooter && <Footer />}
 
     <style>
       #main {

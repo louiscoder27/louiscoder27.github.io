@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import IntroStage from '../components/IntroStage.astro';
 import { SITE } from '../site.config';
-import { CATEGORIES, CATEGORY_META } from '../lib/categories';
+import { CATEGORIES, CATEGORY_META, categorySlug } from '../lib/categories';
 import { getPosts, countByCategory, yearsActive } from '../lib/posts';
 
 const base = import.meta.env.BASE_URL;
@@ -28,7 +28,8 @@ const toWork = (p: (typeof posts)[number]) => ({
     day: 'numeric',
   }),
   category: p.data.category,
-  href: withBase(`/blog/${p.id}`),
+  // Posts live under their category: /courses/<slug>, /vault/<slug>, …
+  href: withBase(`/${categorySlug(p.data.category)}/${p.id}`),
 });
 
 // The "Latest posts" default view + one view per category are all merged into
@@ -37,7 +38,7 @@ const latest = posts.slice(0, 3).map(toWork);
 
 // Each section becomes a tab inside the work box: clicking it swaps the box to
 // show that category's title + posts in place. Reading a post still opens its
-// own /blog/[slug] page.
+// own /<category>/<slug> page.
 const sections = CATEGORIES.map((c) => ({
   name: c,
   slug: CATEGORY_META[c].slug,
@@ -47,7 +48,7 @@ const sections = CATEGORIES.map((c) => ({
 }));
 ---
 
-<BaseLayout>
+<BaseLayout hideFooter>
   <IntroStage
     postsCount={posts.length}
     projectsCount={counts['Projects'] ?? 0}

@@ -1,8 +1,12 @@
 ---
-import PostLayout from '../../layouts/PostLayout.astro';
 import { getPostBySlug } from '../../lib/posts';
-import { highlightCodeBlocks } from '../../lib/highlight';
-import { buildToc } from '../../lib/toc';
+import { categorySlug } from '../../lib/categories';
+
+// Posts moved from /blog/<slug> to a category-nested path (/courses/<slug>,
+// /vault/<slug>, /projects/<slug>). Keep old /blog/<slug> links alive by
+// redirecting them to the post's canonical category URL.
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
 
 const { slug } = Astro.params;
 const post = slug ? await getPostBySlug(slug) : null;
@@ -11,28 +15,7 @@ if (!post) {
   return new Response(null, { status: 404, statusText: 'Post not found' });
 }
 
-// The editor stores code blocks as plain text; colour their tokens here.
-const highlighted = await highlightCodeBlocks(post.body_html);
-// Give every heading a stable anchor id and derive the table of contents.
-const { html: bodyHtml, toc } = buildToc(highlighted);
-
-// Cache the rendered page at the edge; revalidate in the background so a freshly
-// published/edited post shows up quickly without hammering the database.
-Astro.response.headers.set(
-  'Cache-Control',
-  'public, max-age=0, s-maxage=60, stale-while-revalidate=600',
-);
+// 302 (not 301): a post can be moved between categories later, and we don't want
+// browsers to cache a stale category path.
+return Astro.redirect(withBase(`/${categorySlug(post.data.category)}/${slug}`));
 ---
-
-<PostLayout
-  title={post.data.title}
-  description={post.data.description}
-  pubDate={post.data.pubDate}
-  updatedDate={post.data.updatedDate}
-  category={post.data.category}
-  toc={toc}
-  slug={post.id}
-  exportHtml={post.body_html}
->
-  <Fragment set:html={bodyHtml} />
-</PostLayout>

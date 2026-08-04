@@ -1,62 +1,90 @@
 ---
-// Ft2 · Inline-rule single line — contact links, credit, copyright. No columns.
+// Ft2 · Inline-rule single line — brand + credit on the left, contact links on
+// the right, split by a hairline. Background is transparent so the footer blends
+// into whatever page ground it sits on (deep dark on reading/edit pages).
 import { SITE } from '../site.config';
 const year = new Date().getFullYear();
+// GitHub is intentionally dropped from the footer (kept elsewhere, e.g. the
+// home intro, which reads SITE.links directly).
+const footerLinks = SITE.links.filter((l) => l.label.toLowerCase() !== 'github');
 ---
 
 <footer class="foot">
   <div class="page foot__inner">
-    <p class="foot__line">
+    <p class="foot__brand">
       <span class="foot__mark">{SITE.title}</span>
-      {
-        SITE.links.map((l) => (
-          <>
-            <span class="foot__sep" aria-hidden="true">·</span>
-            <a class="foot__link" href={l.href}>{l.label}</a>
-          </>
-        ))
-      }
       <span class="foot__sep" aria-hidden="true">·</span>
       <span class="foot__copy">© {year}</span>
     </p>
+    <nav class="foot__links" aria-label="Contact">
+      {
+        footerLinks.map((l) => (
+          <a class="foot__link" href={l.href}>{l.label}</a>
+        ))
+      }
+    </nav>
   </div>
 </footer>
 
 <style>
   .foot {
     margin-top: 0;
-    background-color: #23212c;
+    /* Blend into the page ground (paper) instead of the old dark band. */
+    background-color: transparent;
   }
   .foot__inner {
-    padding-block: var(--space-lg);
-    background-color: #23212c;
-  }
-  .foot__line {
     display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    /* Match the article's reading frame so the divider is the same length as the
+       rule above the "Back to / Download" buttons (which spans --post-measure),
+       instead of the wider default page container. */
+    max-width: var(--post-measure);
+    /* Compact band, separated from the content above by a hairline. */
+    padding-block: var(--space-md);
+    border-top: var(--rule-hair) solid var(--color-rule);
+    font-family: var(--font-post);
+    font-size: var(--text-xs);
+  }
+  /* From tablet up: brand and links share one row (brand left, links right). */
+  @media (min-width: 40rem) {
+    .foot__inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+  }
+  .foot__brand {
+    display: inline-flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: var(--space-2xs) var(--space-sm);
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    color: var(--color-footer-muted);
+    gap: var(--space-2xs);
+    color: var(--color-muted);
   }
   .foot__mark {
     font-weight: 700;
     letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--color-footer-ink);
+    color: var(--color-accent);
   }
   .foot__sep {
-    color: var(--color-footer-rule);
+    color: var(--color-rule);
+  }
+  .foot__copy {
+    color: var(--color-muted);
+  }
+  .foot__links {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-md);
   }
   .foot__link {
-    color: var(--color-footer-link);
+    color: var(--color-muted);
     white-space: nowrap;
-    padding-bottom: 1px;
-    border-bottom: 1px solid transparent;
-    transition: border-color var(--dur-short) var(--ease-out);
+    text-decoration: none;
+    transition: color var(--dur-short) var(--ease-out);
   }
   .foot__link:hover {
-    border-bottom-color: var(--color-footer-link);
+    color: var(--color-accent);
   }
 </style>

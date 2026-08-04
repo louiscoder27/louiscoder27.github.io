@@ -15,7 +15,7 @@ const { title, description, pubDate, category, slug } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
 const withBase = (p: string) => `${base}${p}`.replace(/\/{2,}/g, '/');
-const href = withBase(`/blog/${slug}`);
+const href = withBase(`/${categorySlug(category)}/${slug}`);
 // Category label points back to the home page's in-page panel for that section.
 const catHref = `${withBase('/')}#${categorySlug(category)}`;
 

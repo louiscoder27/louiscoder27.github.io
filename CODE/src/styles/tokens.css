@@ -164,7 +164,9 @@
   --color-charcoal: #23212c; /* Ink Void — unified dark ground */
 
   /* ---- Surfaces now dark ---- */
-  --color-paper: var(--color-charcoal); /* page ground */
+  /* Page ground: reader-chosen deep near-black (post + edit pages, dark mode only).
+     Raised cards/footer keep the lighter Ink-Void tone below so they lift off it. */
+  --color-paper: #080616;
   --color-paper-2: color-mix(in oklch, var(--color-slate) 22%, var(--color-charcoal)); /* raised card */
   --color-paper-3: color-mix(in oklch, var(--color-light-gold) 12%, transparent); /* code blocks */
 
