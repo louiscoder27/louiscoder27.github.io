@@ -10,19 +10,23 @@ const footerLinks = SITE.links.filter((l) => l.label.toLowerCase() !== 'github')
 ---
 
 <footer class="foot">
-  <div class="page foot__inner">
-    <p class="foot__brand">
-      <span class="foot__mark">{SITE.title}</span>
-      <span class="foot__sep" aria-hidden="true">·</span>
-      <span class="foot__copy">© {year}</span>
-    </p>
-    <nav class="foot__links" aria-label="Contact">
-      {
-        footerLinks.map((l) => (
-          <a class="foot__link" href={l.href}>{l.label}</a>
-        ))
-      }
-    </nav>
+  <div class="foot__wrap">
+    <div class="page foot__col">
+      <div class="foot__row">
+        <p class="foot__brand">
+          <span class="foot__mark">{SITE.title}</span>
+          <span class="foot__sep" aria-hidden="true">·</span>
+          <span class="foot__copy">© {year}</span>
+        </p>
+        <nav class="foot__links" aria-label="Contact">
+          {
+            footerLinks.map((l) => (
+              <a class="foot__link" href={l.href}>{l.label}</a>
+            ))
+          }
+        </nav>
+      </div>
+    </div>
   </div>
 </footer>
 
@@ -32,15 +36,36 @@ const footerLinks = SITE.links.filter((l) => l.label.toLowerCase() !== 'github')
     /* Blend into the page ground (paper) instead of the old dark band. */
     background-color: transparent;
   }
-  .foot__inner {
+  /* Content column: same reading frame + page gutter as the article's `.page`
+     wrapper, so the hairline below sits at the exact content edge. */
+  .foot__col {
+    max-width: var(--post-measure);
+  }
+  /* On post pages at the rail breakpoint the article is centred as an
+     (article + TOC rail) pair, which squeezes the article column and pushes it
+     left. Mirror that exact grid here so the footer's content column lines up
+     with the article column — same length AND same horizontal position as the
+     rule above the "Back to / Download" buttons. (Kept scoped to post pages;
+     the home page footer stays simply centred.) */
+  @media (min-width: 64rem) {
+    :global(body.post-page) .foot__wrap {
+      --toc-w: 13rem;
+      display: grid;
+      grid-template-columns: minmax(0, var(--post-measure)) var(--toc-w);
+      justify-content: center;
+      gap: var(--space-xl);
+      max-width: calc(var(--post-measure) + var(--toc-w) + var(--space-xl));
+      margin-inline: auto;
+      padding-inline: var(--page-gutter);
+    }
+  }
+  .foot__row {
     display: flex;
     flex-direction: column;
     gap: var(--space-2xs);
-    /* Match the article's reading frame so the divider is the same length as the
-       rule above the "Back to / Download" buttons (which spans --post-measure),
-       instead of the wider default page container. */
-    max-width: var(--post-measure);
-    /* Compact band, separated from the content above by a hairline. */
+    /* The border is drawn on the content box (inside the page gutter), so it
+       spans the same length as the rule above the "Back to / Download" buttons
+       (`--post-measure` minus the gutter) rather than overshooting by two gutters. */
     padding-block: var(--space-md);
     border-top: var(--rule-hair) solid var(--color-rule);
     font-family: var(--font-post);
@@ -48,7 +73,7 @@ const footerLinks = SITE.links.filter((l) => l.label.toLowerCase() !== 'github')
   }
   /* From tablet up: brand and links share one row (brand left, links right). */
   @media (min-width: 40rem) {
-    .foot__inner {
+    .foot__row {
       flex-direction: row;
       align-items: center;
       justify-content: space-between;

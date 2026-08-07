@@ -296,7 +296,7 @@ html[data-theme='dark'] .prose pre.shiki span {
  * Scoped to body.post-page (only PostLayout sets themeToggle → this class), so
  * the home/intro page is untouched.
  *   Light:  Coconut #EBE9DD bg · Mocha #524378 content · Olive #A7A955 headings
- *   Dark:   Ink Void #23212C bg · Vanilla Cream #EEEBDA content · headings left as-is
+ *   Dark:   Deep near-black #080616 bg · Vanilla Cream #EEEBDA content · headings left as-is
  */
 body.post-page {
   --color-paper: #ebe9dd; /* Coconut — page background */
@@ -331,7 +331,7 @@ body.post-page .prose h6 {
 }
 
 html[data-theme='dark'] body.post-page {
-  --color-paper: #23212c; /* Ink Void — page background */
+  --color-paper: #080616; /* deep near-black — post/edit page background */
 }
 html[data-theme='dark'] body.post-page .prose {
   color: #eeebda; /* Vanilla Cream — post content */

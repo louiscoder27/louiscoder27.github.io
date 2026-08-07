@@ -408,41 +408,63 @@ const minLevel = toc.reduce((m, e) => Math.min(m, e.level), 6);
       }
     });
 
-    // Scroll-spy: highlight the entry for the heading nearest the top.
+    // Scroll-spy: highlight the last heading you've scrolled past. We compute the
+    // active heading directly from scroll position (deterministic) rather than
+    // from IntersectionObserver "is it in a thin band" events, which left the
+    // highlight stale between headings and raced on load — making it jump around.
     const links = Array.from(
       panel.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'),
     );
-    const byId = new Map<string, HTMLElement>();
-    links.forEach((link) => {
-      const id = decodeURIComponent(link.hash.slice(1));
-      const heading = id ? document.getElementById(id) : null;
-      if (heading) byId.set(id, link.closest('.toc__item') as HTMLElement);
-    });
+    // Entries in document order, each paired with its heading and TOC item.
+    const entries = links
+      .map((link) => {
+        const id = decodeURIComponent(link.hash.slice(1));
+        const heading = id ? document.getElementById(id) : null;
+        const item = link.closest('.toc__item') as HTMLElement | null;
+        return heading && item ? { id, heading, item } : null;
+      })
+      .filter((e): e is { id: string; heading: HTMLElement; item: HTMLElement } => e !== null);
 
-    if (byId.size && 'IntersectionObserver' in window) {
-      const visible = new Set<string>();
-      const setCurrent = (id: string | null) => {
-        byId.forEach((item, key) => item.classList.toggle('is-current', key === id));
+    if (entries.length) {
+      // Line near the top of the viewport that counts as "you're reading here".
+      // Matches the headings' scroll-margin-top so a clicked target reads active.
+      const OFFSET = 100;
+      let currentId: string | null = null;
+      const setCurrent = (id: string) => {
+        if (id === currentId) return;
+        currentId = id;
+        for (const e of entries) e.item.classList.toggle('is-current', e.id === id);
       };
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            const id = entry.target.id;
-            if (entry.isIntersecting) visible.add(id);
-            else visible.delete(id);
-          }
-          // Pick the first heading (document order) currently on screen.
-          const first = links
-            .map((l) => decodeURIComponent(l.hash.slice(1)))
-            .find((id) => visible.has(id));
-          if (first) setCurrent(first);
-        },
-        { rootMargin: '0px 0px -70% 0px', threshold: 0 },
-      );
-      byId.forEach((_item, id) => {
-        const h = document.getElementById(id);
-        if (h) io.observe(h);
-      });
+
+      const update = () => {
+        // Default to the first heading until one has scrolled past the line.
+        let activeId = entries[0].id;
+        for (const e of entries) {
+          if (e.heading.getBoundingClientRect().top - OFFSET <= 0) activeId = e.id;
+          else break;
+        }
+        // At the very bottom of the page, the last heading is what you're reading
+        // even if it never reached the line (short final section).
+        const atBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 2;
+        if (atBottom) activeId = entries[entries.length - 1].id;
+        setCurrent(activeId);
+      };
+
+      // Throttle to one update per frame while scrolling.
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          update();
+          ticking = false;
+        });
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+      update();
     }
   });
 </script>
