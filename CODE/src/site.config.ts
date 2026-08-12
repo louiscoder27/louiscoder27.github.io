@@ -10,11 +10,6 @@ export const SITE = {
     'A personal journal on business analysis, macroeconomics, and building a durable personal portfolio — written in plain English, one essay at a time.',
   // ---- Home hero (the full-screen first page) ----
   hero: {
-    // The big word overlaid on your photo (currently unused — the top-left
-    // wordmark is the hero heading). Kept here in case you want it back.
-    word: 'LOUIS',
-    // The wordmark heading in the top-left corner of the hero.
-    mark: 'Louis Trinh',
     // Quote line(s) shown in the dark bar. Add your own later; leave [] to hide.
     quotes: ['“Chill~~Everything will be fine.”'],
   },

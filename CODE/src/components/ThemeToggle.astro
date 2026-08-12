@@ -42,7 +42,13 @@
     box-shadow: 0 2px 10px color-mix(in oklch, var(--shadow-color) 18%, transparent);
     transition: background-color var(--dur-short) var(--ease-out),
       color var(--dur-short) var(--ease-out),
+      top var(--dur-med) var(--ease-out),
       transform var(--dur-instant) var(--ease-out);
+  }
+  /* When the floating Pomodoro pill is showing (top-right), drop below it so the
+     two don't overlap. The class is toggled on <html> by PomodoroWidget. */
+  html.has-pomo-widget .theme-toggle {
+    top: calc(var(--space-md) + 3.25rem);
   }
   .theme-toggle:hover {
     background-color: var(--color-accent);

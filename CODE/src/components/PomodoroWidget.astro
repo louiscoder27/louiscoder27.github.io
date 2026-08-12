@@ -1,0 +1,121 @@
+---
+// Floating Pomodoro pill — top-right on every page. Shows the running countdown
+// so the timer stays visible while you read a post or browse other sections;
+// clicking it jumps back to the Focus screen. Bound to the shared engine
+// (src/scripts/pomodoro.ts) so it reflects the same background timer everywhere.
+const base = import.meta.env.BASE_URL;
+const focusHref = `${base}#focus`.replace(/\/{2,}/g, '/');
+---
+
+<a
+  class="pomowidget"
+  data-pomo-widget
+  href={focusHref}
+  hidden
+  aria-label="Back to the Focus timer"
+>
+  <span class="pomowidget__dot" aria-hidden="true"></span>
+  <span class="pomowidget__time" data-widget-time>00:00</span>
+  <span class="pomowidget__label" data-widget-label>Focus</span>
+</a>
+
+<style>
+  .pomowidget {
+    position: fixed;
+    top: clamp(0.9rem, 2vw, 1.4rem);
+    right: clamp(0.9rem, 2vw, 1.4rem);
+    z-index: var(--z-overlay);
+    display: inline-flex;
+    /* Baseline so the countdown digits and the FOCUS label sit on one line;
+       the dot is re-centred via align-self below. */
+    align-items: baseline;
+    gap: 0.55rem;
+    padding: 0.5rem 0.9rem 0.5rem 0.75rem;
+    border-radius: 999px;
+    background: color-mix(in oklch, #23212c 78%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in oklch, var(--color-light-gold) 26%, transparent);
+    box-shadow: 0 12px 30px color-mix(in oklch, var(--shadow-color) 45%, transparent);
+    color: var(--color-snow);
+    text-decoration: none;
+    transition:
+      transform var(--dur-short) var(--ease-out),
+      box-shadow var(--dur-short) var(--ease-out);
+  }
+  .pomowidget[hidden] {
+    display: none;
+  }
+  .pomowidget:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 38px color-mix(in oklch, var(--shadow-color) 55%, transparent);
+  }
+  .pomowidget:focus-visible {
+    outline: 2px solid var(--color-light-gold);
+    outline-offset: 2px;
+  }
+  .pomowidget__dot {
+    align-self: center;
+    flex: 0 0 auto;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--color-light-gold);
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-light-gold) 60%, transparent);
+    animation: pomowidget-pulse 1.8s var(--ease-out) infinite;
+  }
+  @keyframes pomowidget-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-light-gold) 55%, transparent); }
+    70% { box-shadow: 0 0 0 0.5rem transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pomowidget__dot { animation: none; }
+  }
+  .pomowidget__time {
+    font-family: var(--font-post);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .pomowidget__label {
+    font-family: var(--font-post);
+    font-size: var(--text-xs);
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: color-mix(in oklch, var(--color-light-gold) 85%, var(--color-snow));
+  }
+</style>
+
+<script>
+  import { pomodoro, type Snapshot } from '../scripts/pomodoro';
+
+  const el = document.querySelector<HTMLAnchorElement>('[data-pomo-widget]');
+  if (el) {
+    const timeEl = el.querySelector<HTMLElement>('[data-widget-time]')!;
+    const labelEl = el.querySelector<HTMLElement>('[data-widget-label]')!;
+
+    // Hide the pill while the full Focus panel is the active view on the home
+    // page — it would just duplicate the big clock right beside it.
+    const onFocusPanel = () => !!document.querySelector('.intro__layer--focus.is-active');
+
+    const update = (s: Snapshot) => {
+      const show = s.running && !onFocusPanel();
+      el.toggleAttribute('hidden', !show);
+      // Signal other fixed top-right chrome (the theme toggle) to make room by
+      // dropping below the pill while it's visible.
+      document.documentElement.classList.toggle('has-pomo-widget', show);
+      if (show) {
+        timeEl.textContent = pomodoro.format(s.remaining);
+        labelEl.textContent = s.mode === 'focus' ? 'Focus' : 'Break';
+      }
+    };
+
+    pomodoro.subscribe(update);
+    // The home page swaps layers via the hash — re-check whether to show.
+    window.addEventListener('hashchange', () => update(pomodoro.get()));
+  }
+</script>

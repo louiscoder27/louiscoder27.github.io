@@ -3,6 +3,7 @@
 import '../styles/tokens.css';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
+import PomodoroWidget from '../components/PomodoroWidget.astro';
 import { SITE } from '../site.config';
 
 interface Props {
@@ -69,6 +70,7 @@ const scriptFontFace =
       <slot />
     </main>
     {!hideFooter && <Footer />}
+    <PomodoroWidget />
 
     <style>
       #main {
