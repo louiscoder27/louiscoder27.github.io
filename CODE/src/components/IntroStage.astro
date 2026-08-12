@@ -92,10 +92,17 @@ const navItems = [
          data-tab to swap the box. The script flips it to open upward when
          opening downward would overrun the viewport bottom. -->
     <nav class="topnav" aria-label="Primary" data-topnav>
-      <span class="topnav__toggle" aria-hidden="true">
+      <button
+        class="topnav__toggle"
+        type="button"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        aria-controls="topnav-list"
+        data-topnav-toggle
+      >
         <span class="topnav__ic topnav__ic--menu" set:html={menuIcon} />
-      </span>
-      <ul class="topnav__list">
+      </button>
+      <ul class="topnav__list" id="topnav-list">
         {
           navItems.map((it) => (
             <li>
@@ -984,10 +991,19 @@ const navItems = [
     top: auto;
     flex-direction: column-reverse;
   }
-  .topnav:hover,
-  .topnav:focus-within {
+  /* Explicit open (tap the grid icon) — works on touch, where there's no hover. */
+  .topnav.is-open {
     width: clamp(12rem, 17vw, 14rem);
     gap: 0.4rem;
+  }
+  /* Hover-to-open only where a real pointer can hover; on touch it would "stick"
+     open with no way to dismiss, so touch relies on the toggle button instead. */
+  @media (hover: hover) {
+    .topnav:hover,
+    .topnav:focus-within {
+      width: clamp(12rem, 17vw, 14rem);
+      gap: 0.4rem;
+    }
   }
 
   /* Collapsed handle — the grid icon that's always visible. Always pinned to the
@@ -1001,8 +1017,19 @@ const navItems = [
     width: 2.5rem;
     height: 2.5rem;
     margin-inline: 0;
+    padding: 0;
+    border: 0;
     border-radius: 0.9rem;
+    background: transparent;
     color: var(--color-ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    /* On touch (no hover) the strip only opens via this button, so give it a
+       clear pressed state. */
+    transition: background-color var(--dur-short) var(--ease-out);
+  }
+  .topnav.is-open .topnav__toggle {
+    background: color-mix(in oklch, var(--color-ink) 10%, transparent);
   }
   .topnav__ic--menu :global(svg) {
     width: 1.55rem;
@@ -1027,10 +1054,16 @@ const navItems = [
   .topnav.is-up .topnav__list {
     flex-direction: column-reverse;
   }
-  .topnav:hover .topnav__list,
-  .topnav:focus-within .topnav__list {
+  .topnav.is-open .topnav__list {
     max-height: 80vh;
     opacity: 1;
+  }
+  @media (hover: hover) {
+    .topnav:hover .topnav__list,
+    .topnav:focus-within .topnav__list {
+      max-height: 80vh;
+      opacity: 1;
+    }
   }
   .topnav__item {
     display: flex;
@@ -1083,12 +1116,20 @@ const navItems = [
       opacity 520ms var(--ease-in-out),
       transform 520ms var(--ease-in-out);
   }
-  .topnav:hover .topnav__label,
-  .topnav:focus-within .topnav__label {
+  .topnav.is-open .topnav__label {
     max-width: 10rem;
     margin-left: 0.8rem;
     opacity: 1;
     transform: none;
+  }
+  @media (hover: hover) {
+    .topnav:hover .topnav__label,
+    .topnav:focus-within .topnav__label {
+      max-width: 10rem;
+      margin-left: 0.8rem;
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* Latest posts */
@@ -1532,7 +1573,9 @@ const navItems = [
   if (topnav) {
     const MARGIN = 16; // px of breathing room to keep at the viewport edge
     const list = topnav.querySelector<HTMLElement>('.topnav__list');
-    let open = false;
+    const toggleBtn = topnav.querySelector<HTMLButtonElement>('[data-topnav-toggle]');
+    const canHover = window.matchMedia('(hover: hover)').matches;
+    const isPinned = () => topnav.classList.contains('is-open');
     let openH = 0;
 
     // The strip's fully-open height, computed *without* forcing the element open
@@ -1567,15 +1610,45 @@ const navItems = [
       }
     };
 
-    // Only reorient/flip while it's actually open (hover or keyboard focus); at
-    // rest it always shows the collapsed icon at the top-left.
-    topnav.addEventListener('pointerenter', () => { open = true; orient(); });
-    topnav.addEventListener('pointerleave', () => { open = false; reset(); });
-    topnav.addEventListener('focusin', () => { open = true; orient(); });
-    topnav.addEventListener('focusout', (e) => {
-      if (!topnav.contains(e.relatedTarget as Node)) { open = false; reset(); }
+    // ---- Explicit open/close (the grid icon is a real button) ----
+    // Touch devices can't hover, so the CSS hover-open is gated to hover-capable
+    // pointers (see the @media (hover: hover) rules). There, tapping the button
+    // toggles `.is-open`; tapping a destination or anywhere outside closes it —
+    // giving mobile a reliable way to *dismiss* the strip after picking a section.
+    const setPinned = (v: boolean) => {
+      topnav.classList.toggle('is-open', v);
+      toggleBtn?.setAttribute('aria-expanded', v ? 'true' : 'false');
+      if (v) orient();
+      else reset();
+    };
+    toggleBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setPinned(!isPinned());
     });
-    window.addEventListener('resize', () => { measure(); if (open) orient(); }, { passive: true });
+    // Choosing a destination collapses the strip.
+    list?.querySelectorAll('a').forEach((a) =>
+      a.addEventListener('click', () => setPinned(false)),
+    );
+    // Tapping/clicking anywhere outside the nav collapses it.
+    document.addEventListener('pointerdown', (e) => {
+      if (isPinned() && !topnav.contains(e.target as Node)) setPinned(false);
+    });
+
+    // Desktop hover / keyboard focus: only reorient/flip while it's actually open;
+    // at rest it always shows the collapsed icon at the top-left. Gated to
+    // hover-capable pointers so a tap on touch never flips a *collapsed* strip.
+    if (canHover) {
+      topnav.addEventListener('pointerenter', () => { if (!isPinned()) orient(); });
+      topnav.addEventListener('pointerleave', () => { if (!isPinned()) reset(); });
+      topnav.addEventListener('focusin', () => { if (!isPinned()) orient(); });
+      topnav.addEventListener('focusout', (e) => {
+        if (!isPinned() && !topnav.contains(e.relatedTarget as Node)) reset();
+      });
+    }
+    window.addEventListener('resize', () => {
+      measure();
+      if (isPinned() || topnav.matches(':hover, :focus-within')) orient();
+    }, { passive: true });
 
     measure();
   }
