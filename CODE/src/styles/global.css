@@ -276,6 +276,60 @@ html[data-theme='dark'] .prose pre.shiki span {
 .prose [data-text-alignment='right'] { text-align: right; }
 .prose [data-text-alignment='justify'] { text-align: justify; }
 
+/* ---- Tables (from the editor's table block) --------------------------------
+ * BlockNote's lossy HTML export emits a bare <table><tr><td …> grid with no
+ * <thead>/<th> and no styling of its own, so without these rules the table
+ * collapses to run-together plain text on the reading page. Borders/padding use
+ * the same hairline token as code blocks so tables match the site. `display:
+ * block` + `overflow-x:auto` lets a wide table scroll inside the column instead
+ * of forcing the whole page wider. */
+.prose table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: var(--space-lg) 0;
+  font-size: 0.95em;
+  border: var(--rule-hair) solid var(--color-rule);
+}
+.prose th,
+.prose td {
+  border: var(--rule-hair) solid var(--color-rule);
+  padding: 0.4em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+/* No <thead> is emitted, so treat the first row as the header band. */
+.prose tr:first-child td,
+.prose th {
+  background: var(--color-paper-3);
+  font-weight: 700;
+}
+.prose td > p,
+.prose th > p {
+  margin: 0;
+}
+
+/* ---- Check-list items (editor's checkbox block) ----------------------------
+ * Exported as <li><input type=checkbox><p>…</p></li> inside a plain <ul>, which
+ * otherwise shows BOTH a bullet and the checkbox, with the text wrapping to the
+ * next line. Drop the bullet and lay the checkbox + text out on one line. */
+.prose li:has(> input[type='checkbox']) {
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+}
+.prose li:has(> input[type='checkbox']) > input {
+  flex: none;
+  margin: 0;
+  transform: translateY(0.15em);
+}
+.prose li:has(> input[type='checkbox']) > p {
+  margin: 0;
+}
+
 .tnum {
   font-variant-numeric: tabular-nums;
 }
